@@ -416,7 +416,8 @@ textarea.input{min-height:96px;resize:vertical}
 .qty button{width:36px;height:36px;border-radius:50%;border:0;background:rgba(255,255,255,.12);color:#fff;font-size:1.2rem;line-height:1}
 .qty button:hover{background:rgba(255,255,255,.2)}
 .qty button:disabled{opacity:.35;cursor:not-allowed}
-.qty output{min-width:28px;text-align:center;font-weight:700}
+.qty-in{width:44px;height:36px;border:0;border-radius:10px;background:transparent;color:#fff;text-align:center;font:700 17px/1 var(--font-text);-moz-appearance:textfield;appearance:textfield}
+.qty-in:focus{outline:none;background:rgba(255,255,255,.14);box-shadow:inset 0 0 0 2px var(--sky)}
 .items-total{display:flex;flex-wrap:wrap;align-items:center;gap:6px 12px;font-weight:600;color:#cfe6fb;font-size:.95rem;padding:12px 14px;border-radius:var(--radius-sm);background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.14)}
 .cart-total{margin-left:auto;font-family:var(--font-title);font-size:1.2rem;color:#fff}
 .item-price{display:block;font-size:.82rem;color:#cfe6fb;margin-top:2px}
@@ -655,7 +656,9 @@ html .choice:active,html .card:active,html .q-card:active,html .base:active,html
    RUTA DEL CAMIONCITO (reemplaza la barra de desplazamiento)
    Gris = lo que falta recorrer · Amarillo = el rastro que deja.
    ========================================================= */
-html{scrollbar-width:none}
+html{scrollbar-width:none;touch-action:manipulation;-webkit-text-size-adjust:100%}
+button,a,label,input,select,textarea,.choice,.sw-row,.qty{touch-action:manipulation}
+input,select,textarea{font-size:max(16px,1em)}
 html::-webkit-scrollbar{display:none}
 .ruta{
   position:fixed;z-index:45;right:16px;top:104px;bottom:26px;width:26px;
@@ -1784,11 +1787,14 @@ const Send = (() => {
           <span class="item-price">${precioDe(t.id) ? `${pesos(precioDe(t.id))} c/u${n ? ` · <b>${pesos(precioDe(t.id) * n)}</b>` : ""}` : "A cotizar"}</span></div>
         <div class="qty" role="group" aria-label="Cantidad de ${t.nombre}">
           <button type="button" data-q="-1" data-id="${t.id}" aria-label="Quitar ${t.nombre}" ${n ? "" : "disabled"}>−</button>
-          <output aria-live="polite">${n}</output>
+          <input class="qty-in" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="2" data-in="${t.id}" value="${n}" aria-label="Cantidad de ${t.nombre}" autocomplete="off">
           <button type="button" data-q="1" data-id="${t.id}" aria-label="Agregar ${t.nombre}">+</button>
         </div>
       </div>`;
     }).join("");
+    pintarTotal();
+  }
+  function pintarTotal() {
     const total = totalBultos();
     const imp = importe();
     $("#itemsTotal").innerHTML = total
@@ -1822,6 +1828,32 @@ const Send = (() => {
     const again = $(`#itemList [data-id="${id}"][data-q="${q}"]`);
     again && !again.disabled && again.focus();
   });
+  // Escribir la cantidad a mano (sin tocar + muchas veces)
+  function filaActualizar(id) {
+    const row = $(`#itemList [data-in="${id}"]`).closest(".item-row");
+    const n = state.items[id] || 0, pr = precioDe(id);
+    row.classList.toggle("on", n > 0);
+    row.querySelector('[data-q="-1"]').disabled = !n;
+    row.querySelector(".item-price").innerHTML = pr ? `${pesos(pr)} c/u${n ? ` · <b>${pesos(pr * n)}</b>` : ""}` : "A cotizar";
+  }
+  $("#itemList").addEventListener("input", e => {
+    const inp = e.target.closest("[data-in]"); if (!inp) return;
+    const id = inp.dataset.in;
+    inp.value = inp.value.replace(/\D/g, "").slice(0, 2);
+    let n = Number(inp.value || 0);
+    const otros = totalBultos() - (state.items[id] || 0);
+    if (otros + n > MAX_BULTOS) {
+      n = Math.max(0, MAX_BULTOS - otros);
+      inp.value = n;
+      setErr("errSize", `Máximo ${MAX_BULTOS} bultos por pedido. Para más, escribinos.`);
+    } else setErr("errSize", "");
+    if (n) state.items[id] = n; else delete state.items[id];
+    filaActualizar(id);
+    pintarTotal();
+  });
+  $("#itemList").addEventListener("focusin", e => { const i = e.target.closest("[data-in]"); if (i) i.select(); });
+  $("#itemList").addEventListener("change", e => { const i = e.target.closest("[data-in]"); if (i && !i.value) i.value = 0; });
+  $("#itemList").addEventListener("keydown", e => { if (e.key === "Enter" && e.target.closest("[data-in]")) { e.preventDefault(); e.target.blur(); } });
   paintItems();
 
   // Medios de pago del envío
