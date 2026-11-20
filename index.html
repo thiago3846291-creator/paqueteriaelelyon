@@ -26,7 +26,7 @@
 <!-- Tipografías: Plus Jakarta Sans (títulos) + Inter (textos) -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Plus+Jakarta+Sans:wght@700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=Barlow+Semi+Condensed:wght@600;700&display=swap" rel="stylesheet">
 
 <!--
   FOTO DEL INICIO
@@ -34,7 +34,7 @@
   reemplazá la URL de abajo Y la de la variable --hero-img en el CSS (busque "HERO_IMG").
   Recomendado: JPG/WebP de ~1600px de ancho y menos de 300 KB.
 -->
-<link rel="preload" as="image" href="https://images.unsplash.com/photo-1601584115197-04ecc0da31d7?auto=format&fit=crop&w=1600&q=70">
+
 
 <style>
 /* =========================================================
@@ -229,10 +229,7 @@ section{scroll-margin-top:90px}
 
 /* Transiciones suaves entre secciones: cada fondo empieza con el color
    en el que termina la sección anterior (sin cortes rectos). */
-#servicios{background:linear-gradient(180deg,var(--tint) 0,#fff 240px)}
 #como{background:linear-gradient(180deg,#fff 0,var(--bg) 55%,var(--tint) 100%)}
-#cotizar{background:linear-gradient(180deg,#fff 0,#fff 40%,var(--bg) 100%)}
-#contacto{background:linear-gradient(180deg,var(--bg) 0,var(--tint) 100%)}
 .sec-head{display:grid;gap:12px;max-width:640px;margin-bottom:40px}
 .sec-head .kicker{font-size:.82rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--blue)}
 .sec-head h2{font-size:clamp(1.8rem,4vw,2.6rem);font-weight:800}
@@ -708,6 +705,170 @@ html.lite .overlay{background:rgba(3,10,26,.7)}
   .reveal{opacity:1;transform:none}
   .tl.current .dot::before{animation:none;opacity:.4;transform:scale(1.3)}
 }
+
+/* =========================================================
+   REDISEÑO "AZUL NOCTURNO"  (60% azul noche · 30% gris perla · 10% turquesa)
+   Superficies sólidas, sin desenfoques ni brillos. Tipografía Barlow:
+   la de los carteles de ruta, legible y con carácter de transporte.
+   ========================================================= */
+:root{
+  --night:#101E32; --night-2:#172A44; --night-3:#0B1626;
+  --pearl:#E8EDF3; --pearl-ink:#4A5A70;
+  --teal:#42C5BC; --teal-hover:#5BD3CB; --teal-ink:#17786F;
+  /* las variables viejas pasan a la paleta nueva (paneles, seguimiento, formularios) */
+  --navy:#101E32; --navy-2:#172A44; --blue:#42C5BC; --blue-ink:#17786F;
+  --sky:#42C5BC; --gold:#9FE3DD; --ink:#101E32; --muted:#4A5A70;
+  --bg:#E8EDF3; --line:#d5dde7;
+  --font-title:"Barlow Semi Condensed","Barlow",system-ui,sans-serif;
+  --font-text:"Barlow",system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+body{background:var(--pearl);color:var(--night);font-size:17px}
+h1,h2,h3,h4{letter-spacing:-.005em}
+
+/* Botones */
+.btn-accent{background:var(--teal);color:var(--night);font-weight:600}
+.btn-accent:hover{background:var(--teal-hover)}
+.btn-primary{background:var(--teal);color:var(--night)}
+.btn-primary:hover{background:var(--teal-hover)}
+.btn-outline{background:transparent;color:#fff;border-color:rgba(232,237,243,.55)}
+.btn-outline:hover{background:rgba(232,237,243,.1);border-color:#fff}
+.btn-lg{min-height:54px;padding:0 1.7em;font-size:1.05rem}
+.btn-wa{box-shadow:none}
+.btn{border-radius:12px}
+
+/* Navegación: transparente sobre la foto, sólida al bajar */
+.nav{
+  top:0;left:0;transform:none;width:100%;border-radius:0;
+  padding:14px max(20px,calc((100% - 1140px) / 2));gap:24px;
+  background:transparent;transition:background-color .3s,padding .3s,box-shadow .3s;
+}
+.nav.solid{background:var(--night);padding-top:10px;padding-bottom:10px;box-shadow:0 1px 0 rgba(232,237,243,.08)}
+.brand-word{font-family:var(--font-title);font-weight:700;font-size:1.45rem;line-height:1;color:#fff;margin:0;text-decoration:none}
+.brand-word small{display:block;font-family:var(--font-text);font-weight:500;font-size:.72rem;letter-spacing:.02em;color:#A9B6C8;margin-top:3px}
+.brand{text-decoration:none}
+.nav-links a{font-size:1rem;border-radius:10px}
+.nav-links a:hover{background:rgba(232,237,243,.1)}
+.nav-cta{min-height:44px}
+@media (max-width:860px){
+  .nav{padding-left:16px;padding-right:16px;gap:10px}
+  .nav-links{top:calc(100% + 6px);left:12px;right:12px;background:var(--night);border-radius:16px;border:1px solid rgba(232,237,243,.12)}
+  .nav-cta{order:2;margin-left:auto;padding:0 1em}
+  .nav-toggle{order:3;margin-left:0;border-radius:12px}
+}
+@media (max-width:420px){.nav-cta{display:none}.nav-toggle{margin-left:auto}}
+
+/* 1. Hero */
+.rd-hero{position:relative;min-height:100vh;min-height:100svh;display:grid;place-items:center;text-align:center;color:#fff;overflow:hidden;background:var(--night);isolation:isolate}
+.rd-hero-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 60%;z-index:-2}
+.rd-hero::after{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(180deg,rgba(16,30,50,.72) 0%,rgba(16,30,50,.48) 45%,rgba(16,30,50,.86) 100%)}
+.rd-hero-inner{width:min(900px,100% - 40px);padding:120px 0 90px;display:grid;justify-items:center;gap:22px}
+.rd-hero-brand{font-weight:600;color:var(--teal);font-size:1rem}
+.rd-hero h1{font-size:clamp(2.7rem,8vw,5.6rem);font-weight:700;line-height:.98;text-wrap:balance}
+.rd-hero-sub{font-size:clamp(1.08rem,2.3vw,1.3rem);color:#D7DFEA;max-width:34ch}
+.rd-hero-ctas{display:flex;flex-wrap:wrap;justify-content:center;gap:12px;margin-top:10px}
+@media (max-width:480px){.rd-hero-ctas{width:100%;flex-direction:column}.rd-hero-ctas .btn{width:100%}}
+
+/* Secciones */
+.rd-sec{padding:clamp(72px,10vw,128px) 0}
+.rd-pearl{background:var(--pearl);color:var(--night)}
+.rd-night{background:var(--night);color:var(--pearl)}
+.rd-head{max-width:720px;margin-bottom:clamp(36px,5vw,56px)}
+.rd-kicker{font-weight:600;font-size:1rem;color:var(--teal-ink);margin-bottom:10px}
+.rd-night .rd-kicker{color:var(--teal)}
+.rd-sec h2{font-size:clamp(2.1rem,5vw,3.4rem);font-weight:700;line-height:1.02;text-wrap:balance}
+.rd-lead{font-size:1.12rem;color:var(--pearl-ink);margin-top:16px;max-width:52ch}
+.rd-night .rd-lead{color:#A9B6C8}
+.rd-fine{font-size:.92rem;color:var(--pearl-ink);margin-top:14px}
+.rd-night .rd-fine{color:#A9B6C8}
+.rd-row{display:flex;flex-wrap:wrap;gap:12px;margin-top:32px}
+.rd-link{display:inline-flex;align-items:center;gap:.4em;background:none;border:0;padding:0;font-weight:600;color:var(--teal-ink);text-decoration:none;cursor:pointer}
+.rd-link svg{width:18px;height:18px;transition:transform .2s var(--ease)}
+.rd-link:hover svg{transform:translateX(4px)}
+.rd-link-sm{font-size:inherit}
+
+/* 2. Servicios: una foto protagonista y dos secundarias */
+.rd-services{display:grid;gap:28px}
+.rd-svc{display:grid;gap:18px}
+.rd-svc img{width:100%;aspect-ratio:16/10;object-fit:cover;border-radius:16px;background:#cfd8e3}
+.rd-svc h3{font-size:1.75rem;font-weight:700}
+.rd-svc p{color:var(--pearl-ink);margin:8px 0 14px;max-width:44ch}
+@media (min-width:900px){
+  .rd-services{grid-template-columns:1.25fr 1fr;grid-template-rows:auto auto;gap:36px 48px}
+  .rd-svc-main{grid-row:1 / span 2}
+  .rd-svc-main img{aspect-ratio:4/5}
+  .rd-svc-main h3{font-size:2.2rem}
+  .rd-svc:not(.rd-svc-main){grid-template-columns:44% 1fr;align-items:center;gap:24px}
+  .rd-svc:not(.rd-svc-main) img{aspect-ratio:1/1}
+}
+
+/* 3. Solicitar + precios */
+.rd-split{display:grid;gap:56px;align-items:start}
+.rd-split > *{min-width:0}
+.rd-hero-img,.rd-svc img{color:transparent}
+@media (min-width:900px){.rd-split{grid-template-columns:1.1fr .9fr;gap:80px}}
+.rd-steps{list-style:none;padding:0;margin:34px 0 0;counter-reset:paso}
+.rd-steps li{counter-increment:paso;position:relative;padding:18px 0 18px 56px;border-top:1px solid rgba(232,237,243,.12);color:#C9D3E0;font-size:1.06rem}
+.rd-steps li::before{content:counter(paso,decimal-leading-zero);position:absolute;left:0;top:16px;font-family:var(--font-title);font-weight:700;font-size:1.25rem;color:var(--teal);line-height:1.4}
+.rd-steps b{color:#fff;font-weight:600}
+.rd-prices{background:var(--night-2);border:1px solid rgba(232,237,243,.1);border-radius:18px;padding:28px}
+.rd-prices-head{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:8px;margin-bottom:8px}
+.rd-prices h3{font-size:1.5rem;font-weight:700}
+.rd-prices .ej-note{color:#F2C46B}
+.rd-price-list{list-style:none;padding:0;margin:0}
+.rd-price-list li{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:14px 0;border-top:1px solid rgba(232,237,243,.1)}
+.rd-price-list li:first-child{border-top:0}
+.rd-price-list strong{display:block;font-weight:600;color:#fff}
+.rd-price-list small{display:block;color:#A9B6C8;font-size:.9rem}
+.rd-price{font-family:var(--font-title);font-weight:700;font-size:1.35rem;color:var(--teal);white-space:nowrap}
+.rd-price.tbd{font-family:var(--font-text);font-weight:500;font-size:.95rem;color:#A9B6C8}
+
+/* 4. Seguimiento */
+@media (min-width:900px){.rd-split-rev{grid-template-columns:1fr .85fr;align-items:center}}
+.rd-facts{list-style:none;padding:0;margin:30px 0 0;display:grid;gap:14px}
+.rd-facts li{position:relative;padding-left:22px;color:var(--pearl-ink)}
+.rd-facts li::before{content:"";position:absolute;left:0;top:.62em;width:8px;height:8px;border-radius:2px;background:var(--teal)}
+.rd-facts b{color:var(--night);font-weight:600}
+.rd-track{background:#fff;border-radius:18px;padding:30px;display:grid;gap:12px;box-shadow:0 1px 0 rgba(16,30,50,.06),0 18px 40px rgba(16,30,50,.08)}
+.rd-track label{font-weight:600;font-size:1.05rem}
+.rd-track-row{display:flex;gap:10px;min-width:0}
+.rd-track{min-width:0}
+@media (max-width:420px){.rd-track{padding:22px}.rd-track-row{flex-direction:column}.rd-track .btn{width:100%}}
+.rd-input{flex:1;min-width:0;min-height:54px;padding:0 16px;border-radius:12px;border:1.5px solid #c9d3df;background:#fff;color:var(--night);font:600 1.1rem var(--font-text);letter-spacing:.04em;text-transform:uppercase}
+.rd-input::placeholder{color:#93a1b4;letter-spacing:.04em}
+.rd-input:focus{outline:none;border-color:var(--teal-ink);box-shadow:0 0 0 4px rgba(66,197,188,.25)}
+.rd-track .btn{min-height:54px;padding:0 1.5em}
+.rd-track .field-err{color:#b4372a}
+
+/* 5. Cobertura: dos bases, sin tarjetas */
+.rd-bases{display:grid;gap:0;border-top:1px solid rgba(232,237,243,.14)}
+@media (min-width:760px){.rd-bases{grid-template-columns:1fr 1fr}.rd-base + .rd-base{border-left:1px solid rgba(232,237,243,.14);padding-left:48px}}
+.rd-base{padding:34px 24px 34px 0;display:grid;gap:10px}
+.rd-base h3{font-size:2.2rem;font-weight:700;color:#fff}
+.rd-base .prov{color:#A9B6C8;font-size:1rem;font-family:var(--font-text);font-weight:500;margin-left:8px}
+.rd-base p{color:#C9D3E0}
+.rd-base .who{color:#fff;font-weight:600}
+.rd-base .rd-row{margin-top:14px}
+.rd-base .btn-call{background:transparent;color:#fff;border-color:rgba(232,237,243,.4)}
+.rd-base .btn-call:hover{border-color:#fff}
+
+/* 6. Pie */
+footer.rd-foot{background:var(--night-3);color:#C9D3E0;padding:64px 0 28px}
+.rd-foot-top{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:28px;padding-bottom:36px;border-bottom:1px solid rgba(232,237,243,.1)}
+.rd-foot-claim{margin-top:14px;font-size:1.1rem;color:#A9B6C8}
+.rd-foot-cta p{margin-bottom:10px;color:#fff;font-weight:600}
+.rd-foot-bottom{display:flex;flex-wrap:wrap;gap:12px 28px;justify-content:space-between;padding-top:22px;font-size:.9rem;color:#8796AB}
+.rd-foot-bottom button{background:none;border:0;padding:0;color:#C9D3E0;text-decoration:underline;text-underline-offset:3px}
+
+/* Paneles en la paleta nueva: sólidos */
+.glass-dark{background:var(--night)}
+.overlay{background:rgba(11,22,38,.72)}
+
+/* Ruta del camioncito en la paleta nueva */
+.ruta-gris{background:repeating-linear-gradient(180deg,rgba(150,165,185,.7) 0 10px,transparent 10px 17px)}
+.ruta-amarilla{background:var(--teal)}
+.ruta-punto.inicio{background:var(--teal)}
+.ruta.llego .ruta-punto.fin{background:var(--teal)}
+
 </style>
 </head>
 <body>
@@ -778,169 +939,161 @@ html.lite .overlay{background:rgba(3,10,26,.7)}
 <a class="sr-only" href="#servicios">Saltar al contenido</a>
 
 <!-- ============ 1. NAVEGACIÓN ============ -->
-<header class="nav glass" id="nav">
+<header class="nav" id="nav">
   <a class="brand" href="#inicio" aria-label="Transporte El Elyon, ir al inicio">
-    <span class="brand-mark"><svg aria-hidden="true"><use href="#i-truck"/></svg></span>
-    <span>El Elyon<small>Transporte</small></span>
+    <span class="brand-word">El Elyon<small>Transporte</small></span>
   </a>
   <button class="nav-toggle" id="navToggle" aria-expanded="false" aria-controls="navLinks" aria-label="Abrir menú">
     <svg aria-hidden="true"><use href="#i-menu"/></svg>
   </button>
   <ul class="nav-links" id="navLinks">
     <li><a href="#servicios">Servicios</a></li>
-    <li><a href="#inicio" data-open="track">Seguimiento</a></li>
-    <li><a href="#seguridad">Seguridad</a></li>
-    <li><a href="#contacto">Contacto</a></li>
+    <li><a href="#solicitar">Envíos</a></li>
+    <li><a href="#seguimiento">Seguimiento</a></li>
+    <li><a href="#cobertura">Cobertura</a></li>
   </ul>
-  <button class="btn btn-wa" data-wa-pick="Hola, quiero consultar por un envío, encomienda o mudanza." aria-label="Escribinos por WhatsApp">
-    <svg aria-hidden="true"><use href="#i-wa"/></svg><span>Escribinos</span>
-  </button>
+  <button class="btn btn-accent nav-cta" data-open="send" aria-haspopup="dialog">Solicitar envío</button>
 </header>
 
 <main>
-<!-- ============ 2. INICIO ============ -->
-<section class="hero" id="inicio" aria-labelledby="heroTitle">
-  <div class="wrap hero-inner">
-    <span class="eyebrow reveal">Goya · Resistencia</span>
-    <h1 id="heroTitle" class="reveal">Tu carga, <em>nuestro compromiso.</em></h1>
-    <p class="hero-sub reveal">Paquetería, encomiendas y mudanzas entre Goya y Resistencia, dentro y fuera de la ciudad.</p>
-
-    <h2 class="hero-q reveal">¿Qué necesitás hoy?</h2>
-    <div class="choices">
-      <button class="choice glass reveal" data-open="send" aria-haspopup="dialog">
-        <span class="choice-ico"><svg aria-hidden="true"><use href="#i-box"/></svg></span>
-        <span class="txt"><h3>Enviar un paquete</h3><p>Lo retiramos y lo llevamos, con contrarreembolso si querés.</p></span>
-        <span class="go">Empezar <svg aria-hidden="true"><use href="#i-arrow"/></svg></span>
-      </button>
-      <button class="choice glass reveal" data-open="move" aria-haspopup="dialog">
-        <span class="choice-ico"><svg aria-hidden="true"><use href="#i-home"/></svg></span>
-        <span class="txt"><h3>Mudanza</h3><p>Contanos qué hay que mover y te pasamos presupuesto.</p></span>
-        <span class="go">Pedir presupuesto <svg aria-hidden="true"><use href="#i-arrow"/></svg></span>
-      </button>
-      <button class="choice glass star reveal" data-open="track" aria-haspopup="dialog">
-        <span class="choice-ico"><svg aria-hidden="true"><use href="#i-route"/></svg></span>
-        <span class="txt"><h3>Seguir mi pedido</h3><p>Mirá en qué etapa está tu envío, paso a paso.</p></span>
-        <span class="go">Ver seguimiento <svg aria-hidden="true"><use href="#i-arrow"/></svg></span>
-      </button>
-    </div>
-
-    <div class="hero-contact reveal">
-      <span>Goya: <a href="https://wa.me/5493777391240?text=Hola%2C%20quiero%20consultar%20por%20un%20env%C3%ADo%2C%20encomienda%20o%20mudanza.">Gonzalo · 3777 391240</a></span>
-      <span>Resistencia: <a href="https://wa.me/5493624562017?text=Hola%2C%20quiero%20consultar%20por%20un%20env%C3%ADo%2C%20encomienda%20o%20mudanza.">Daniel · 3624 562017</a></span>
+<!-- ============ 1. INICIO ============ -->
+<section class="rd-hero" id="inicio" aria-labelledby="heroTitle">
+  <img class="rd-hero-img" alt="Camión de carga en movimiento por una ruta"
+       src="https://images.unsplash.com/photo-1655220711988-430a51a5c254?auto=format&fit=crop&q=60&w=1600"
+       srcset="https://images.unsplash.com/photo-1655220711988-430a51a5c254?auto=format&fit=crop&q=60&w=800 800w, https://images.unsplash.com/photo-1655220711988-430a51a5c254?auto=format&fit=crop&q=60&w=1280 1280w, https://images.unsplash.com/photo-1655220711988-430a51a5c254?auto=format&fit=crop&q=60&w=1920 1920w"
+       sizes="100vw" fetchpriority="high" decoding="async">
+  <div class="rd-hero-inner">
+    <p class="rd-hero-brand reveal">Transporte El Elyon</p>
+    <h1 id="heroTitle" class="reveal">Tus envíos, en buenas manos.</h1>
+    <p class="rd-hero-sub reveal">Solicitá un envío y seguí su recorrido desde un solo lugar.</p>
+    <div class="rd-hero-ctas reveal">
+      <button class="btn btn-accent btn-lg" data-open="send" aria-haspopup="dialog">Solicitar envío</button>
+      <button class="btn btn-outline btn-lg" data-open="track" aria-haspopup="dialog">Seguir pedido</button>
     </div>
   </div>
 </section>
 
-<!-- ============ 6. SERVICIOS ============ -->
-<section class="sec sec-white" id="servicios" aria-labelledby="servTitle">
+<!-- ============ 2. SERVICIOS ============ -->
+<section class="rd-sec rd-pearl" id="servicios" aria-labelledby="servTitle">
   <div class="wrap">
-    <div class="sec-head reveal">
-      <span class="kicker">Servicios</span>
-      <h2 id="servTitle">Lo que hacemos, bien hecho.</h2>
-      <p>Buenos precios, responsabilidad y confiabilidad en cada viaje.</p>
-    </div>
-    <div class="cards">
-      <article class="card reveal">
-        <span class="card-ico"><svg aria-hidden="true"><use href="#i-box"/></svg></span>
-        <h3>Paquetería</h3>
-        <p>Envíos dentro y fuera de la ciudad. Retiramos tu paquete y lo llevamos a destino.</p>
-        <button class="link-arrow" data-open="send">Enviar un paquete <svg aria-hidden="true"><use href="#i-arrow"/></svg></button>
+    <header class="rd-head reveal">
+      <p class="rd-kicker">Servicios</p>
+      <h2 id="servTitle">Lo que hacemos todos los días.</h2>
+    </header>
+    <div class="rd-services">
+      <article class="rd-svc rd-svc-main reveal">
+        <img loading="lazy" decoding="async" alt="Persona descargando cajones de una camioneta"
+             src="https://images.unsplash.com/photo-1761574319274-8a3a9cd80a6e?auto=format&fit=crop&q=60&w=900" srcset="https://images.unsplash.com/photo-1761574319274-8a3a9cd80a6e?auto=format&fit=crop&q=60&w=600 600w, https://images.unsplash.com/photo-1761574319274-8a3a9cd80a6e?auto=format&fit=crop&q=60&w=900 900w, https://images.unsplash.com/photo-1761574319274-8a3a9cd80a6e?auto=format&fit=crop&q=60&w=1300 1300w"
+             sizes="(min-width:900px) 55vw, 100vw">
+        <div class="rd-svc-body">
+          <h3>Paquetería</h3>
+          <p>Retiramos tu paquete y lo llevamos, dentro y fuera de la ciudad.</p>
+          <button class="rd-link" data-open="send">Solicitar envío <svg aria-hidden="true"><use href="#i-arrow"/></svg></button>
+        </div>
       </article>
-      <article class="card reveal">
-        <span class="card-ico"><svg aria-hidden="true"><use href="#i-truck"/></svg></span>
-        <h3>Reparto de encomiendas</h3>
-        <p>Repartimos tus encomiendas y, si lo necesitás, cobramos al entregar.</p>
-        <button class="link-arrow" data-open="send">Coordinar un reparto <svg aria-hidden="true"><use href="#i-arrow"/></svg></button>
+      <article class="rd-svc reveal">
+        <img loading="lazy" decoding="async" alt="Camionetas de reparto estacionadas en una calle"
+             src="https://images.unsplash.com/photo-1727101981835-50bade3c4eaf?auto=format&fit=crop&q=60&w=700" srcset="https://images.unsplash.com/photo-1727101981835-50bade3c4eaf?auto=format&fit=crop&q=60&w=500 500w, https://images.unsplash.com/photo-1727101981835-50bade3c4eaf?auto=format&fit=crop&q=60&w=900 900w" sizes="(min-width:900px) 35vw, 100vw">
+        <div class="rd-svc-body">
+          <h3>Reparto de encomiendas</h3>
+          <p>Para comercios y emprendedores. Si lo necesitás, cobramos al entregar.</p>
+          <button class="rd-link" data-open="send">Coordinar un reparto <svg aria-hidden="true"><use href="#i-arrow"/></svg></button>
+        </div>
       </article>
-      <article class="card reveal">
-        <span class="card-ico"><svg aria-hidden="true"><use href="#i-home"/></svg></span>
-        <h3>Mudanzas</h3>
-        <p>Departamentos, casas y oficinas. Te pasamos presupuesto según lo que haya que llevar.</p>
-        <button class="link-arrow" data-open="move">Pedir presupuesto <svg aria-hidden="true"><use href="#i-arrow"/></svg></button>
+      <article class="rd-svc reveal">
+        <img loading="lazy" decoding="async" alt="Cajas de mudanza en un living"
+             src="https://images.unsplash.com/photo-1714647211902-bb711d643a17?auto=format&fit=crop&q=60&w=700" srcset="https://images.unsplash.com/photo-1714647211902-bb711d643a17?auto=format&fit=crop&q=60&w=500 500w, https://images.unsplash.com/photo-1714647211902-bb711d643a17?auto=format&fit=crop&q=60&w=900 900w" sizes="(min-width:900px) 35vw, 100vw">
+        <div class="rd-svc-body">
+          <h3>Mudanzas</h3>
+          <p>Casas, departamentos y oficinas. Te pasamos presupuesto sin compromiso.</p>
+          <button class="rd-link" data-open="move">Pedir presupuesto <svg aria-hidden="true"><use href="#i-arrow"/></svg></button>
+        </div>
       </article>
     </div>
   </div>
 </section>
 
-<!-- ============ 7. CÓMO FUNCIONA ============ -->
-<section class="sec" id="como" aria-labelledby="howTitle">
-  <div class="wrap">
-    <div class="sec-head reveal">
-      <span class="kicker">Cómo funciona</span>
-      <h2 id="howTitle">Tres pasos. Sin vueltas.</h2>
+<!-- ============ 3. SOLICITAR UN ENVÍO (cómo funciona + precios) ============ -->
+<section class="rd-sec rd-night" id="solicitar" aria-labelledby="reqTitle">
+  <div class="wrap rd-split">
+    <div class="reveal">
+      <p class="rd-kicker">Solicitar un envío</p>
+      <h2 id="reqTitle">Pedilo en dos minutos.</h2>
+      <ol class="rd-steps">
+        <li><b>Pedís</b> desde la web o por WhatsApp: origen, destino y bultos.</li>
+        <li><b>Te confirmamos</b> por WhatsApp y pasamos a retirar el día y la franja que elegiste.</li>
+        <li><b>Entregamos</b> y te avisamos, con foto de la entrega.</li>
+      </ol>
+      <div class="rd-row">
+        <button class="btn btn-accent btn-lg" data-open="send" aria-haspopup="dialog">Solicitar envío</button>
+        <button class="btn btn-outline btn-lg" data-open="move" aria-haspopup="dialog">Pedir mudanza</button>
+      </div>
     </div>
-    <ol class="steps">
-      <li class="step reveal"><span class="step-n">1<span>.</span></span><h3>Pedís</h3><p>Desde esta web o por WhatsApp, en un par de minutos.</p></li>
-      <li class="step reveal"><span class="step-n">2<span>.</span></span><h3>Retiramos</h3><p>Pasamos a buscar tu carga el día y en la franja que elegiste.</p></li>
-      <li class="step reveal"><span class="step-n">3<span>.</span></span><h3>Entregamos y te avisamos</h3><p>Llevamos tu envío a destino y te avisamos cuando está entregado.</p></li>
-    </ol>
-  </div>
-</section>
-
-<!-- ============ 8. SEGURIDAD Y CONFIANZA ============ -->
-<section class="sec sec-dark" id="seguridad" aria-labelledby="secTitle">
-  <div class="wrap">
-    <div class="sec-head reveal">
-      <span class="kicker">Seguridad y confianza</span>
-      <h2 id="secTitle">Tu carga, en buenas manos.</h2>
-      <p>Rápido, seguro y con gente que da la cara.</p>
-    </div>
-    <div class="trust reveal">
-      <div class="trust-item"><span class="card-ico"><svg aria-hidden="true"><use href="#i-cash"/></svg></span><div><h3>Contrarreembolso</h3><p>Cobramos al entregar y te rendimos el dinero.</p></div></div>
-      <div class="trust-item"><span class="card-ico"><svg aria-hidden="true"><use href="#i-camera"/></svg></span><div><h3>Foto de entrega</h3><p>Cada entrega queda registrada con foto.</p></div></div>
-      <div class="trust-item"><span class="card-ico"><svg aria-hidden="true"><use href="#i-route"/></svg></span><div><h3>Seguimiento</h3><p>Sabés en qué etapa está tu envío.</p></div></div>
-      <div class="trust-item"><span class="card-ico"><svg aria-hidden="true"><use href="#i-user"/></svg></span><div><h3>Gente que responde</h3><p>Te atienden Gonzalo y Daniel, personas con nombre.</p></div></div>
+    <div class="rd-prices reveal" aria-labelledby="quoteTitle">
+      <div class="rd-prices-head">
+        <h3 id="quoteTitle">Precios por bulto</h3>
+        <p class="ej-note" id="quoteEj"></p>
+      </div>
+      <ul class="rd-price-list" id="quoteGrid"><!-- se completa desde CONFIG.precios --></ul>
+      <p class="rd-fine">Entre Goya y Resistencia. El total se calcula al armar tu envío.</p>
     </div>
   </div>
 </section>
 
-<!-- ============ 9. COTIZACIÓN ============ -->
-<section class="sec sec-white" id="cotizar" aria-labelledby="quoteTitle">
-  <div class="wrap">
-    <div class="sec-head reveal">
-      <span class="kicker">Cotización</span>
-      <h2 id="quoteTitle">Cotizá tu envío.</h2>
-      <p>Precios por bulto entre Goya y Resistencia. Armá tu envío y ves el total al instante.</p>
-      <p class="ej-note" id="quoteEj"></p>
+<!-- ============ 4. SEGUIMIENTO ============ -->
+<section class="rd-sec rd-pearl" id="seguimiento" aria-labelledby="trackSecTitle">
+  <div class="wrap rd-split rd-split-rev">
+    <div class="reveal">
+      <p class="rd-kicker">Seguimiento</p>
+      <h2 id="trackSecTitle">Sabés dónde está tu envío.</h2>
+      <p class="rd-lead">Cada pedido tiene un código. Con él ves cada etapa, del retiro a la entrega.</p>
+      <ul class="rd-facts">
+        <li><b>Confirmación previa.</b> Nadie sale a buscar tu paquete sin hablar antes con vos.</li>
+        <li><b>Foto de entrega.</b> Cada entrega queda registrada con foto y nombre de quien recibe.</li>
+        <li><b>Contrarreembolso.</b> Cobramos al entregar y te rendimos el dinero.</li>
+        <li><b>Gente que responde.</b> Te atienden Gonzalo y Daniel, con nombre y teléfono.</li>
+      </ul>
     </div>
-    <div class="quote-grid" id="quoteGrid"><!-- se completa desde CONFIG.precios --></div>
+    <form class="rd-track reveal" id="rdTrackForm" novalidate>
+      <label for="rdTrackCode">Código de pedido</label>
+      <div class="rd-track-row">
+        <input class="rd-input" id="rdTrackCode" placeholder="EL-XXXX-XXXX" autocomplete="off" spellcheck="false" maxlength="14">
+        <button class="btn btn-accent" type="submit">Seguir</button>
+      </div>
+      <p class="rd-fine">¿Pediste desde este celular o compu? <button type="button" class="rd-link rd-link-sm" data-open="track">Ver mis pedidos</button></p>
+    </form>
   </div>
 </section>
 
-<!-- ============ 10. CONTACTO Y COBERTURA ============ -->
-<section class="sec" id="contacto" aria-labelledby="contactTitle">
+<!-- ============ 5. COBERTURA ============ -->
+<section class="rd-sec rd-night" id="cobertura" aria-labelledby="coverTitle">
   <div class="wrap">
-    <div class="sec-head reveal">
-      <span class="kicker">Contacto y cobertura</span>
-      <h2 id="contactTitle">Dos bases, una misma forma de trabajar.</h2>
-      <p>Consultanos por la base que te quede más cerca.</p>
-    </div>
-    <div class="bases" id="bases"><!-- se completa desde CONFIG.bases --></div>
+    <header class="rd-head reveal">
+      <p class="rd-kicker">Recorridos y cobertura</p>
+      <h2 id="coverTitle">Goya y Resistencia, dentro y fuera de la ciudad.</h2>
+      <p class="rd-lead">Dos bases propias. Hacemos envíos dentro de cada ciudad y entre las dos. ¿Otro destino? Consultanos.</p>
+    </header>
+    <div class="rd-bases" id="bases"><!-- se completa desde CONFIG.bases --></div>
   </div>
 </section>
 </main>
 
-<!-- ============ 11. PIE ============ -->
-<footer>
+<!-- ============ 6. CONTACTO Y PIE ============ -->
+<footer class="rd-foot" id="contacto">
   <div class="wrap">
-    <div class="foot">
+    <div class="rd-foot-top">
       <div>
-        <a class="brand" href="#inicio"><span class="brand-mark"><svg aria-hidden="true"><use href="#i-truck"/></svg></span><span>Transporte El Elyon</span></a>
-        <p class="foot-slogan">“Tu carga, nuestro compromiso”</p>
+        <p class="brand-word">El Elyon<small>Transporte</small></p>
+        <p class="rd-foot-claim">Tu carga, nuestro compromiso.</p>
       </div>
-      <div>
-        <h4>Goya</h4>
-        <p>9 de Julio 2557, Goya, Corrientes</p>
-        <p>Gonzalo · <a href="https://wa.me/5493777391240?text=Hola%2C%20quiero%20consultar%20por%20un%20env%C3%ADo%2C%20encomienda%20o%20mudanza.">3777 391240</a></p>
-      </div>
-      <div>
-        <h4>Resistencia</h4>
-        <p>Avda. McLean 2650, Resistencia, Chaco</p>
-        <p>Daniel · <a href="https://wa.me/5493624562017?text=Hola%2C%20quiero%20consultar%20por%20un%20env%C3%ADo%2C%20encomienda%20o%20mudanza.">3624 562017</a></p>
+      <div class="rd-foot-cta">
+        <p>¿Tenés una consulta?</p>
+        <button class="btn btn-wa" data-wa-pick="Hola, quiero consultar por un envío, encomienda o mudanza."><svg aria-hidden="true"><use href="#i-wa"/></svg> Escribinos por WhatsApp</button>
       </div>
     </div>
-    <div class="foot-bottom">
-      <span>© 2026 Transporte El Elyon</span>
+    <div class="rd-foot-bottom">
+      <span>© 2026 Transporte El Elyon · Goya · Resistencia</span>
+      <span>Fotos: Unsplash</span>
       <button type="button" data-open="privacy">Política de privacidad</button>
     </div>
   </div>
@@ -1394,37 +1547,40 @@ const Api = (() => {
    ========================================================= */
 function renderBases() {
   $("#bases").innerHTML = Object.entries(CONFIG.bases).map(([key, b]) => `
-    <article class="base reveal">
-      <div class="base-top"><h3>${esc(b.ciudad)}</h3><span class="pill">${esc(b.provincia)}</span></div>
-      <dl>
-        <div><dt>${icon("i-pin")}<span class="sr-only">Dirección</span></dt><dd>${esc(b.direccion)}</dd></div>
-        <div><dt>${icon("i-user")}<span class="sr-only">Contacto</span></dt><dd>${esc(b.contacto)}<small>Te atiende personalmente</small></dd></div>
-        <div><dt>${icon("i-phone")}<span class="sr-only">Teléfono</span></dt><dd><a href="tel:${b.llamada}">${esc(b.telefono)}</a></dd></div>
-      </dl>
-      <div class="base-actions">
-        <a class="btn btn-wa"
-           href="${waLink(b.whatsapp, `Hola ${b.contacto}, quiero consultar por un envío, encomienda o mudanza.`)}">
-           ${icon("i-wa")} WhatsApp con ${esc(b.contacto)}</a>
-        <a class="btn btn-light" href="tel:${b.llamada}">${icon("i-phone")} Llamar</a>
+    <article class="rd-base reveal">
+      <h3>${esc(b.ciudad)}<span class="prov">${esc(b.provincia)}</span></h3>
+      <p>${esc(b.direccion)}</p>
+      <p><span class="who">${esc(b.contacto)}</span> te atiende personalmente · <a href="tel:${b.llamada}">${esc(b.telefono)}</a></p>
+      <div class="rd-row">
+        <a class="btn btn-wa" href="${waLink(b.whatsapp, `Hola ${b.contacto}, quiero consultar por un envío, encomienda o mudanza.`)}">${icon("i-wa")} WhatsApp con ${esc(b.contacto)}</a>
+        <a class="btn btn-call" href="tel:${b.llamada}">${icon("i-phone")} Llamar</a>
       </div>
     </article>`).join("");
 }
 
+/* Barra superior sólida al bajar + seguimiento desde la sección */
+(() => {
+  const nav = $("#nav");
+  const onScroll = () => nav.classList.toggle("solid", window.scrollY > 40);
+  window.addEventListener("scroll", onScroll, { passive: true }); onScroll();
+  const f = $("#rdTrackForm");
+  if (f) f.addEventListener("submit", e => {
+    e.preventDefault();
+    const c = $("#rdTrackCode").value.trim().toUpperCase();
+    openPanel("track");
+    if (c) { $("#trackCode").value = c; Tracker.search(c); }
+  });
+})();
+
 function renderQuotes() {
   const items = [
-    ...CONFIG.tamanos.filter(t => t.id !== "especial").map(t => ({ id: t.id, nombre: t.nombre, desc: t.desc, icono: t.icono })),
-    { id: "mudanza", nombre: "Mudanza", desc: "Departamento, casa u oficina", icono: "i-home" }
+    ...CONFIG.tamanos.filter(t => t.id !== "especial").map(t => ({ id: t.id, nombre: t.nombre, desc: t.desc })),
+    { id: "mudanza", nombre: "Mudanza", desc: "Departamento, casa u oficina" }
   ];
   $("#quoteGrid").innerHTML = items.map(it => {
     const p = CONFIG.precios[it.id];
-    return `
-    <article class="q-card reveal">
-      <span class="card-ico">${icon(it.icono)}</span>
-      <h3>${esc(it.nombre)}</h3>
-      <p class="q-desc">${esc(it.desc)}</p>
-      <p class="price ${p ? "" : "tbd"}">${p ? `${pesos(p)} <small style="font-weight:500;color:var(--muted);font-family:var(--font-text);font-size:.8rem">por bulto</small>` : "Precio a consultar"}</p>
-      <button class="btn btn-wa" type="button" data-wa-pick="Hola, quiero consultar el precio de: ${esc(it.nombre)}.">${icon("i-wa")} Consultar</button>
-    </article>`;
+    return `<li><span><strong>${esc(it.nombre)}</strong><small>${esc(it.desc)}</small></span>
+      <span class="rd-price ${p ? "" : "tbd"}">${p ? pesos(p) : "A consultar"}</span></li>`;
   }).join("");
 }
 
