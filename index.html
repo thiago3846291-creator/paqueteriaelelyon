@@ -558,11 +558,57 @@ textarea.input{min-height:96px;resize:vertical}
 .privacy ul{margin:0 0 12px;padding-left:20px;color:#dbe7f7}
 
 /* =========================================================
+   8b. EFECTO "LIQUID GLASS" AL PASAR EL MOUSE / TOCAR
+   Las tarjetas se levantan con un rebote suave, el ícono se mueve
+   y una luz sigue al puntero sobre el vidrio.
+   ========================================================= */
+.choice,.card,.step,.q-card,.base,.trust-item{
+  position:relative;isolation:isolate;
+  --mx:50%;--my:50%;
+  transition:transform .45s cubic-bezier(.34,1.56,.64,1),box-shadow .45s var(--ease),border-color .3s,background-color .3s;
+  will-change:transform;
+}
+.card,.step,.q-card,.base{overflow:hidden}
+/* luz que sigue al puntero */
+.choice::after,.card::after,.step::after,.q-card::after,.base::after,.trust-item::after{
+  content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;z-index:-1;
+  opacity:0;transition:opacity .35s var(--ease);
+  background:radial-gradient(260px circle at var(--mx) var(--my),rgba(69,179,236,.20),transparent 65%);
+}
+.choice::after{z-index:0;background:radial-gradient(240px circle at var(--mx) var(--my),rgba(255,255,255,.22),transparent 60%)}
+.trust-item::after{background:radial-gradient(240px circle at var(--mx) var(--my),rgba(69,179,236,.16),transparent 65%)}
+.choice > *{position:relative;z-index:1}
+.choice-ico,.card-ico,.step-n{transition:transform .5s cubic-bezier(.34,1.56,.64,1)}
+
+@media (hover:hover){
+  html .choice:hover{transform:translateY(-10px) scale(1.025);border-color:rgba(255,255,255,.55);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.6),0 26px 60px rgba(2,10,30,.55),0 0 0 1px rgba(69,179,236,.25),0 0 40px rgba(69,179,236,.25)}
+  html .card:hover,html .q-card:hover,html .base:hover,html .step:hover{transform:translateY(-8px);border-color:#bcd3f3;
+    box-shadow:0 24px 50px rgba(15,40,90,.14),0 0 0 4px rgba(69,179,236,.08)}
+  .trust-item:hover{background:#0c2453}
+  .choice:hover::after,.card:hover::after,.step:hover::after,.q-card:hover::after,.base:hover::after,.trust-item:hover::after{opacity:1}
+  .choice:hover .choice-ico,.card:hover .card-ico,.q-card:hover .card-ico,.trust-item:hover .card-ico{transform:translateY(-4px) rotate(-8deg) scale(1.12)}
+  .step:hover .step-n{transform:translateY(-3px) scale(1.12)}
+  .btn:hover{transform:translateY(-2px)}
+  .btn-wa:hover{box-shadow:0 12px 26px rgba(15,127,67,.45)}
+  .btn-primary:hover{box-shadow:0 12px 26px rgba(21,89,196,.4)}
+  .nav-links a{transition:background-color .2s,transform .3s cubic-bezier(.34,1.56,.64,1)}
+  .nav-links a:hover{transform:translateY(-2px)}
+  .item-row:hover,.my-item:hover{transform:translateY(-2px)}
+}
+.item-row,.my-item{transition:transform .35s cubic-bezier(.34,1.56,.64,1),border-color .2s,background-color .2s}
+/* En celular (sin mouse): al tocar, la tarjeta se hunde un poco y vuelve con rebote */
+html .choice:active,html .card:active,html .q-card:active,html .base:active,html .step:active,html .my-item:active{transform:scale(.97);transition-duration:.12s}
+.choice:active::after{opacity:1}
+
+/* =========================================================
    9. ANIMACIONES AL HACER SCROLL
    ========================================================= */
 .reveal{opacity:0;transform:translateY(16px);transition:opacity .4s var(--ease),transform .4s var(--ease)}
 .reveal.in{opacity:1;transform:none}
 .hero .reveal{transition-duration:.6s}
+/* Una vez que aparecieron, las tarjetas usan la transición con rebote */
+.reveal.in:is(.choice,.card,.step,.q-card,.base){transition:transform .45s cubic-bezier(.34,1.56,.64,1),box-shadow .45s var(--ease),border-color .3s,background-color .3s,opacity .4s var(--ease)}
 
 @media (prefers-reduced-motion:reduce){
   html{scroll-behavior:auto}
@@ -2250,6 +2296,17 @@ const Tracker = (() => {
 renderBases();
 renderQuotes();
 if (CONFIG.preciosEjemplo) $("#quoteEj").textContent = "Precios de ejemplo para la demostración.";
+
+// Luz del "liquid glass" que sigue al puntero (solo con mouse)
+if (window.matchMedia("(hover: hover)").matches && !reduceMotion) {
+  document.addEventListener("pointermove", e => {
+    const el = e.target.closest(".choice,.card,.step,.q-card,.base,.trust-item");
+    if (!el) return;
+    const r = el.getBoundingClientRect();
+    el.style.setProperty("--mx", `${e.clientX - r.left}px`);
+    el.style.setProperty("--my", `${e.clientY - r.top}px`);
+  }, { passive: true });
+}
 
 // Aparición suave al hacer scroll
 (() => {
