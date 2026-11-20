@@ -99,7 +99,7 @@ body.lock{overflow:hidden}
 }
 .glass-dark{
   /* Casi opaco y SIN desenfoque de fondo: se ve igual y no recalcula la página de atrás en cada cuadro */
-  background:linear-gradient(180deg,rgba(16,40,86,.97),rgba(8,26,58,.98));
+  background:linear-gradient(180deg,#10285a,#081a3a);
   border:1px solid rgba(255,255,255,.18);
   box-shadow:inset 0 1px 0 rgba(255,255,255,.25),0 30px 80px rgba(0,0,0,.45);
 }
@@ -544,6 +544,29 @@ textarea.input{min-height:96px;resize:vertical}
 .code-alt summary::after{content:" +";color:var(--sky)}
 .code-alt[open] summary::after{content:" −"}
 .code-alt .track-form{margin-top:12px}
+/* Interruptores estilo iPhone (franjas horarias) */
+.sw-list{display:grid;border-radius:18px;overflow:hidden;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.16)}
+.sw-row{position:relative;display:flex;align-items:center;gap:14px;padding:14px 16px;cursor:pointer;transition:background-color .25s}
+.sw-row + .sw-row{border-top:1px solid rgba(255,255,255,.1)}
+.sw-row:hover{background:rgba(255,255,255,.04)}
+.sw-row input{position:absolute;opacity:0;width:1px;height:1px;pointer-events:none}
+.sw-ico{width:40px;height:40px;flex:none;border-radius:12px;display:grid;place-items:center;background:rgba(255,255,255,.08);transition:background-color .3s,transform .4s cubic-bezier(.34,1.56,.64,1)}
+.sw-ico svg{width:22px;height:22px;stroke:#cfe6fb;transition:stroke .3s}
+.sw-txt{display:grid;gap:1px}
+.sw-txt strong{font-weight:600;font-size:1rem}
+.sw-txt small{color:#b9cae2;font-size:.85rem}
+.sw{margin-left:auto;flex:none;position:relative;width:51px;height:31px;border-radius:999px;background:rgba(255,255,255,.2);box-shadow:inset 0 0 0 1px rgba(255,255,255,.14);transition:background-color .3s}
+.sw::after{content:"";position:absolute;top:2px;left:2px;width:27px;height:27px;border-radius:999px;background:#fff;
+  box-shadow:0 3px 8px rgba(0,0,0,.28),0 1px 1px rgba(0,0,0,.12);transition:transform .35s cubic-bezier(.34,1.45,.64,1),width .2s}
+.sw-row:active .sw::after{width:33px}
+.sw-row input:checked ~ .sw{background:#34c759}
+.sw-row input:checked ~ .sw::after{transform:translateX(20px)}
+.sw-row:active input:checked ~ .sw::after{transform:translateX(14px)}
+.sw-row:has(input:checked){background:rgba(52,199,89,.08)}
+.sw-row input:checked ~ .sw-ico{background:rgba(242,163,58,.2);transform:rotate(-8deg) scale(1.06)}
+.sw-row input:checked ~ .sw-ico svg{stroke:#ffd27a}
+.sw-row input:focus-visible ~ .sw{outline:2px solid var(--sky);outline-offset:3px}
+
 .policy{margin-top:14px;padding:12px 14px;border-radius:var(--radius-sm);background:rgba(242,163,58,.08);border:1px solid rgba(242,163,58,.35);font-size:.88rem;color:#e3ecf8;display:grid;gap:6px}
 .policy strong{display:flex;align-items:center;gap:8px;color:#fff;font-size:.92rem}
 .policy ul{margin:0;padding-left:18px;display:grid;gap:4px}
@@ -732,6 +755,8 @@ html.lite .overlay{background:rgba(3,10,26,.7)}
     <symbol id="i-camera" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></symbol>
     <symbol id="i-chat" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16v11H9l-5 4z"/><path d="M8 10h8M8 13h5"/></symbol>
     <symbol id="i-card" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="5" width="19" height="14" rx="2"/><path d="M2.5 10h19M6 15h4"/></symbol>
+    <symbol id="i-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2M12 19.5v2M2.5 12h2M19.5 12h2M5.3 5.3l1.4 1.4M17.3 17.3l1.4 1.4M5.3 18.7l1.4-1.4M17.3 6.7l1.4-1.4"/></symbol>
+    <symbol id="i-sunset" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M7 15a5 5 0 0 1 10 0"/><path d="M2.5 15h19M5 19h14M12 4v3M4.9 8.4l1.6 1.2M19.1 8.4l-1.6 1.2"/></symbol>
     <symbol id="i-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7"/></symbol>
     <symbol id="i-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></symbol>
     <symbol id="i-left" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></symbol>
@@ -962,7 +987,7 @@ html.lite .overlay{background:rgba(3,10,26,.7)}
       <div class="fstep" data-name="Retiro">
         <h3>¿Cuándo lo retiramos?</h3>
         <div class="field"><span class="lbl">Día de retiro</span><div class="cal" id="sendCal"></div><p class="field-err" id="errSendDate" role="alert"></p></div>
-        <div class="field"><span class="lbl">Franja horaria</span><div class="chips" id="sendSlots" role="radiogroup" aria-label="Franja horaria de retiro"></div><p class="field-err" id="errSendSlot" role="alert"></p></div>
+        <div class="field"><span class="lbl">Franja horaria</span><div class="sw-list" id="sendSlots" role="radiogroup" aria-label="Franja horaria de retiro"></div><p class="field-err" id="errSendSlot" role="alert"></p></div>
       </div>
       <!-- Paso 4 -->
       <div class="fstep" data-name="Pago y datos">
@@ -1075,7 +1100,7 @@ html.lite .overlay{background:rgba(3,10,26,.7)}
       <div class="fstep" data-name="Fecha">
         <h3>¿Cuándo te mudás?</h3>
         <div class="field"><span class="lbl">Fecha</span><div class="cal" id="moveCal"></div><p class="field-err" id="errMoveDate" role="alert"></p></div>
-        <div class="field"><span class="lbl">Horario de inicio preferido</span><div class="chips" id="moveSlots" role="radiogroup" aria-label="Horario de inicio preferido"></div><p class="field-err" id="errMoveSlot" role="alert"></p></div>
+        <div class="field"><span class="lbl">Horario de inicio preferido</span><div class="sw-list" id="moveSlots" role="radiogroup" aria-label="Horario de inicio preferido"></div><p class="field-err" id="errMoveSlot" role="alert"></p></div>
       </div>
       <!-- Paso 4 -->
       <div class="fstep" data-name="Detalles">
@@ -1619,6 +1644,23 @@ function setErr(id, msg, input) {
 }
 const phoneOk = v => v.replace(/\D/g, "").length >= 8;
 
+/* Filas con interruptor estilo iPhone para elegir una franja horaria.
+   "Mañana (8 a 12 h)" -> título "Mañana" y detalle "8 a 12 h". */
+function filasInterruptor(name, opciones) {
+  return opciones.map(f => {
+    const m = f.match(/^(.*?)\s*\((.*)\)\s*$/);
+    const titulo = m ? m[1] : f, detalle = m ? m[2] : "";
+    const ico = /tarde|noche/i.test(f) ? "i-sunset" : /mañana/i.test(f) ? "i-sun" : "i-clock";
+    return `
+    <label class="sw-row">
+      <input type="radio" name="${name}" value="${esc(f)}">
+      <span class="sw-ico">${icon(ico)}</span>
+      <span class="sw-txt"><strong>${esc(titulo)}</strong>${detalle ? `<small>${esc(detalle)}</small>` : ""}</span>
+      <span class="sw" aria-hidden="true"></span>
+    </label>`;
+  }).join("");
+}
+
 /* Política de reservas (texto armado desde CONFIG.politica) */
 function politicaHTML(mudanza) {
   const P = CONFIG.politica;
@@ -1824,9 +1866,8 @@ const Send = (() => {
   }
   paintPay();
 
-  // Franjas
-  $("#sendSlots").innerHTML = CONFIG.franjas.map(f => `
-    <label class="opt"><input type="radio" name="sendSlot" value="${f}"><span class="face">${icon("i-clock")}${f}</span></label>`).join("");
+  // Franjas: filas con interruptor estilo iPhone (el texto va afuera, a la izquierda)
+  $("#sendSlots").innerHTML = filasInterruptor("sendSlot", CONFIG.franjas);
   $("#sendSlots").addEventListener("change", e => { state.slot = e.target.value; setErr("errSendSlot", ""); });
 
   const cal = createCalendar($("#sendCal"), d => { state.date = d; setErr("errSendDate", ""); });
@@ -2034,8 +2075,7 @@ const Move = (() => {
   $("#ambMinus").addEventListener("click", () => { state.amb = Math.max(1, state.amb - 1); paintAmb(); });
   $("#ambPlus").addEventListener("click", () => { state.amb = Math.min(8, state.amb + 1); paintAmb(); });
 
-  $("#moveSlots").innerHTML = CONFIG.franjas.map(f => `
-    <label class="opt"><input type="radio" name="moveSlot" value="${f}"><span class="face">${icon("i-clock")}${f}</span></label>`).join("");
+  $("#moveSlots").innerHTML = filasInterruptor("moveSlot", CONFIG.franjas);
   $("#moveSlots").addEventListener("change", e => { state.slot = e.target.value; setErr("errMoveSlot", ""); });
   const cal = createCalendar($("#moveCal"), d => { state.date = d; setErr("errMoveDate", ""); });
 
