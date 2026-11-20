@@ -1,0 +1,2066 @@
+<!doctype html>
+<html lang="es-AR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Transporte El Elyon · Paquetería, encomiendas y mudanzas</title>
+<meta name="description" content="Transporte El Elyon: paquetería dentro y fuera de la ciudad, reparto de encomiendas y mudanzas entre Goya y Resistencia. Tu carga, nuestro compromiso.">
+<meta name="theme-color" content="#081a3a">
+
+<!-- Tipografías: Plus Jakarta Sans (títulos) + Inter (textos) -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Plus+Jakarta+Sans:wght@700;800&display=swap" rel="stylesheet">
+
+<!--
+  FOTO DEL INICIO
+  Foto de banco gratuita (Unsplash). Para usar una foto real de la camioneta de El Elyon,
+  reemplazá la URL de abajo Y la de la variable --hero-img en el CSS (busque "HERO_IMG").
+  Recomendado: JPG/WebP de ~1600px de ancho y menos de 300 KB.
+-->
+<link rel="preload" as="image" href="https://images.unsplash.com/photo-1601584115197-04ecc0da31d7?auto=format&fit=crop&w=1600&q=70">
+
+<style>
+/* =========================================================
+   1. VARIABLES (colores tomados del folleto)
+   ========================================================= */
+:root{
+  --navy:#081a3a;        /* azul marino de fondo */
+  --navy-2:#0e2b5e;
+  --blue:#1559c4;        /* azul fuerte del folleto */
+  --blue-ink:#0f47a3;
+  --sky:#45b3ec;         /* celeste del folleto */
+  --gold:#f2a33a;        /* acento dorado/naranja: usar poco */
+  --ink:#0f1b2d;
+  --muted:#52627a;
+  --line:#e3e8f1;
+  --bg:#f5f7fb;
+  --white:#ffffff;
+  --wa:#0f7f43;          /* verde WhatsApp oscurecido para contraste AA con texto blanco */
+  --wa-hover:#0c6b38;
+  --tint:#eaf2fd;        /* celeste muy claro para unir fondos azules y blancos */
+  --fade:150px;          /* alto de los degradados entre secciones */
+  --radius:20px;
+  --radius-sm:14px;
+  --ease:cubic-bezier(.2,.7,.2,1);
+  --font-title:"Plus Jakarta Sans", system-ui, sans-serif;
+  --font-text:"Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  /* HERO_IMG: reemplazar por la foto real de la camioneta */
+  --hero-img:url("https://images.unsplash.com/photo-1601584115197-04ecc0da31d7?auto=format&fit=crop&w=1600&q=70");
+}
+
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{margin:0;font-family:var(--font-text);color:var(--ink);background:var(--bg);line-height:1.55;font-size:16px;-webkit-font-smoothing:antialiased}
+img,svg{display:block;max-width:100%}
+h1,h2,h3,h4{font-family:var(--font-title);line-height:1.1;margin:0;letter-spacing:-.02em}
+p{margin:0}
+a{color:inherit}
+button,input,textarea,select{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:3px solid var(--sky);outline-offset:3px;border-radius:8px}
+[hidden]{display:none !important}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+.wrap{width:min(1140px,100% - 32px);margin-inline:auto}
+body.lock{overflow:hidden}
+
+/* =========================================================
+   2. VIDRIO ("liquid glass") + alternativa sin backdrop-filter
+   ========================================================= */
+.glass{
+  position:relative;
+  background:linear-gradient(180deg,rgba(255,255,255,.17),rgba(255,255,255,.07));
+  border:1px solid rgba(255,255,255,.24);
+  -webkit-backdrop-filter:blur(18px) saturate(150%);
+  backdrop-filter:blur(18px) saturate(150%);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.38),0 12px 34px rgba(2,10,30,.35);
+}
+/* brillo sutil en el borde superior */
+.glass::before{
+  content:"";position:absolute;inset:0 12% auto;height:1px;border-radius:inherit;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.9),transparent);
+  opacity:.7;pointer-events:none;
+}
+.glass-dark{
+  background:linear-gradient(180deg,rgba(14,38,82,.80),rgba(8,26,58,.86));
+  border:1px solid rgba(255,255,255,.18);
+  -webkit-backdrop-filter:blur(26px) saturate(150%);
+  backdrop-filter:blur(26px) saturate(150%);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.25),0 30px 80px rgba(0,0,0,.45);
+}
+@supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){
+  .glass{background:rgba(20,45,95,.88)}
+  .glass-dark{background:rgba(8,26,58,.97)}
+  .nav.glass{background:rgba(8,26,58,.94)}
+}
+
+/* =========================================================
+   3. BOTONES
+   ========================================================= */
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:.5em;
+  min-height:46px;padding:.7em 1.25em;border-radius:999px;border:1px solid transparent;
+  font-weight:600;font-size:.98rem;text-decoration:none;white-space:nowrap;
+  transition:transform .2s var(--ease),background-color .2s var(--ease),box-shadow .2s var(--ease),border-color .2s;
+}
+.btn:active{transform:scale(.97)}
+.btn svg{width:20px;height:20px;flex:none}
+.btn-wa{background:var(--wa);color:#fff;box-shadow:0 6px 18px rgba(15,127,67,.35)}
+.btn-wa:hover{background:var(--wa-hover)}
+.btn-primary{background:var(--blue);color:#fff}
+.btn-primary:hover{background:var(--blue-ink)}
+.btn-ghost{background:rgba(255,255,255,.08);color:#fff;border-color:rgba(255,255,255,.28)}
+.btn-ghost:hover{background:rgba(255,255,255,.16)}
+.btn-light{background:#fff;color:var(--blue-ink);border-color:var(--line)}
+.btn-light:hover{border-color:var(--blue)}
+.btn[disabled]{opacity:.5;cursor:not-allowed}
+.link-arrow{display:inline-flex;align-items:center;gap:.35em;font-weight:600;color:var(--blue);background:none;border:0;padding:0;text-decoration:none}
+.link-arrow svg{width:18px;height:18px;transition:transform .2s var(--ease)}
+.link-arrow:hover svg{transform:translateX(3px)}
+
+/* =========================================================
+   4. NAVEGACIÓN
+   ========================================================= */
+.nav{
+  position:fixed;z-index:40;top:12px;left:50%;transform:translateX(-50%);
+  width:min(1140px,100% - 24px);border-radius:999px;
+  display:flex;align-items:center;gap:16px;padding:8px 8px 8px 18px;color:#fff;
+  background:linear-gradient(180deg,rgba(10,30,70,.55),rgba(10,30,70,.40));
+}
+.brand{display:flex;align-items:center;gap:10px;text-decoration:none;font-family:var(--font-title);font-weight:800;letter-spacing:-.01em;white-space:nowrap}
+.brand-mark{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;background:linear-gradient(160deg,var(--sky),var(--blue));box-shadow:inset 0 1px 0 rgba(255,255,255,.5)}
+.brand-mark svg{width:20px;height:20px}
+.brand small{display:block;font-family:var(--font-text);font-weight:500;font-size:.7rem;opacity:.75;letter-spacing:.02em}
+.nav-links{display:flex;gap:4px;margin-left:auto;list-style:none;padding:0;margin-block:0}
+.nav-links a{display:block;padding:.55em .9em;border-radius:999px;text-decoration:none;font-weight:500;font-size:.95rem;opacity:.9;transition:background-color .2s}
+.nav-links a:hover{background:rgba(255,255,255,.12);opacity:1}
+.nav .btn-wa{min-height:42px}
+.nav-toggle{display:none;margin-left:auto;width:44px;height:44px;border-radius:50%;border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.08);color:#fff;place-items:center}
+.nav-toggle svg{width:22px;height:22px}
+@media (max-width:860px){
+  .nav{padding-left:14px}
+  .nav-toggle{display:grid}
+  .nav-links{
+    position:absolute;top:calc(100% + 8px);left:0;right:0;flex-direction:column;padding:8px;border-radius:22px;
+    background:rgba(8,26,58,.92);-webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px);
+    border:1px solid rgba(255,255,255,.18);
+    opacity:0;visibility:hidden;transform:translateY(-6px);transition:opacity .2s,transform .2s var(--ease),visibility .2s;
+  }
+  .nav-links.open{opacity:1;visibility:visible;transform:none}
+  .nav-links a{padding:.85em 1em}
+  .nav .btn-wa span{display:none}
+  .nav .btn-wa{width:44px;height:44px;padding:0;min-height:44px}
+}
+
+/* =========================================================
+   5. INICIO (hero)
+   ========================================================= */
+.hero{
+  position:relative;min-height:100vh;min-height:100svh;color:#fff;
+  display:flex;align-items:center;padding:110px 0 calc(var(--fade) + 24px);isolation:isolate;overflow:hidden;
+  background-color:var(--navy);
+}
+.hero::before{ /* foto */
+  content:"";position:absolute;inset:0;z-index:-2;
+  background:var(--hero-img) center/cover no-repeat;
+}
+.hero::after{ /* degradado azul marino para legibilidad */
+  content:"";position:absolute;inset:0;z-index:-1;
+  background:
+    /* fundido inferior: del azul marino al celeste muy claro de la sección siguiente */
+    linear-gradient(180deg,transparent calc(100% - var(--fade)),rgba(22,72,150,.55) calc(100% - var(--fade) * .5),var(--tint) 100%),
+    linear-gradient(180deg,rgba(6,18,44,.80) 0%,rgba(8,26,58,.70) 45%,rgba(6,18,44,.94) 100%),
+    radial-gradient(80% 60% at 15% 20%,rgba(21,89,196,.35),transparent 70%);
+}
+.hero-inner{display:grid;gap:22px}
+.eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:.85rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:#cfe6fb}
+.eyebrow::before{content:"";width:22px;height:2px;background:var(--gold);border-radius:2px}
+.hero h1{font-size:clamp(2.3rem,6.4vw,4.4rem);font-weight:800;max-width:14ch}
+.hero h1 em{font-style:normal;color:var(--sky)}
+.hero-sub{font-size:clamp(1.02rem,1.9vw,1.2rem);max-width:56ch;color:#dbe7f7}
+.hero-q{margin-top:18px;font-family:var(--font-title);font-weight:700;font-size:1.15rem}
+.choices{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.choice{
+  text-align:left;color:#fff;border-radius:var(--radius);padding:22px 20px 20px;
+  display:grid;gap:14px;align-content:start;min-height:170px;
+  transition:transform .25s var(--ease),background-color .25s,border-color .25s,box-shadow .25s;
+}
+.choice:hover{transform:translateY(-4px);border-color:rgba(255,255,255,.45);box-shadow:inset 0 1px 0 rgba(255,255,255,.5),0 18px 40px rgba(2,10,30,.45)}
+.choice-ico{width:48px;height:48px;border-radius:14px;display:grid;place-items:center;background:rgba(69,179,236,.18);border:1px solid rgba(255,255,255,.2)}
+.choice-ico svg{width:26px;height:26px;stroke:#fff}
+.choice h3{font-size:1.25rem;font-weight:700}
+.choice p{font-size:.93rem;color:#d3e1f3}
+.choice .go{display:inline-flex;align-items:center;gap:6px;font-weight:600;font-size:.9rem;color:var(--sky)}
+.choice .go svg{width:16px;height:16px;transition:transform .2s var(--ease)}
+.choice:hover .go svg{transform:translateX(3px)}
+.choice.star{border-color:rgba(242,163,58,.55)}
+.choice .tag{justify-self:start;font-size:.72rem;font-weight:600;letter-spacing:.04em;padding:.2em .6em;border-radius:999px;background:rgba(242,163,58,.18);color:#ffd59c;border:1px solid rgba(242,163,58,.4)}
+.hero-contact{display:flex;flex-wrap:wrap;gap:10px 22px;font-size:.9rem;color:#c9d8ec;margin-top:6px}
+.hero-contact a{text-decoration:none;border-bottom:1px solid rgba(255,255,255,.25)}
+@media (max-width:760px){
+  .choices{grid-template-columns:1fr}
+  .choice{min-height:0;grid-template-columns:48px 1fr;align-items:center;column-gap:16px;padding:16px}
+  .choice .txt{display:grid;gap:4px}
+  .choice .go,.choice .tag-row{display:none}
+}
+
+/* =========================================================
+   6. SECCIONES (fondo claro, texto sólido y legible)
+   ========================================================= */
+section{scroll-margin-top:90px}
+.sec{padding:clamp(64px,9vw,112px) 0}
+.sec-white{background:#fff}
+@media (max-width:760px){:root{--fade:110px}}
+
+/* Transiciones suaves entre secciones: cada fondo empieza con el color
+   en el que termina la sección anterior (sin cortes rectos). */
+#servicios{background:linear-gradient(180deg,var(--tint) 0,#fff 240px)}
+#como{background:linear-gradient(180deg,#fff 0,var(--bg) 55%,var(--tint) 100%)}
+#cotizar{background:linear-gradient(180deg,#fff 0,#fff 40%,var(--bg) 100%)}
+#contacto{background:linear-gradient(180deg,var(--bg) 0,var(--tint) 100%)}
+.sec-head{display:grid;gap:12px;max-width:640px;margin-bottom:40px}
+.sec-head .kicker{font-size:.82rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--blue)}
+.sec-head h2{font-size:clamp(1.8rem,4vw,2.6rem);font-weight:800}
+.sec-head p{color:var(--muted);font-size:1.05rem}
+
+.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+@media (max-width:860px){.cards{grid-template-columns:1fr}}
+.card{background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:26px;display:grid;gap:12px;align-content:start;transition:transform .25s var(--ease),box-shadow .25s,border-color .25s}
+.sec-white .card{background:var(--bg)}
+.card:hover{transform:translateY(-3px);box-shadow:0 16px 40px rgba(15,40,90,.08);border-color:#cfd9ea}
+.card-ico{width:50px;height:50px;border-radius:14px;display:grid;place-items:center;background:#e9f2fe;color:var(--blue)}
+.card-ico svg{width:26px;height:26px}
+.card h3{font-size:1.25rem;font-weight:700}
+.card p{color:var(--muted)}
+
+/* Cómo funciona */
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;counter-reset:s;list-style:none;padding:0;margin:0}
+@media (max-width:860px){.steps{grid-template-columns:1fr}}
+.step{position:relative;padding:26px;border-radius:var(--radius);background:#fff;border:1px solid var(--line);display:grid;gap:10px}
+.step-n{font-family:var(--font-title);font-weight:800;font-size:2.4rem;line-height:1;color:var(--blue)}
+.step-n span{color:var(--gold)}
+.step h3{font-size:1.2rem}
+.step p{color:var(--muted)}
+
+/* Seguridad (fondo oscuro) */
+.sec-dark{
+  color:#fff;
+  padding:calc(var(--fade) + 48px) 0 calc(var(--fade) + 48px);
+  background:
+    radial-gradient(60% 45% at 85% 35%,rgba(21,89,196,.35),transparent 70%),
+    linear-gradient(180deg,
+      var(--tint) 0,
+      #3a76c8 calc(var(--fade) * .35),
+      #12397a calc(var(--fade) * .7),
+      var(--navy) var(--fade),
+      var(--navy) calc(100% - var(--fade)),
+      #12397a calc(100% - var(--fade) * .7),
+      #3a76c8 calc(100% - var(--fade) * .35),
+      #fff 100%);
+}
+.sec-dark .sec-head .kicker{color:var(--sky)}
+.sec-dark .sec-head p{color:#c3d3ea}
+.trust{display:grid;grid-template-columns:repeat(2,1fr);gap:1px;border-radius:var(--radius);overflow:hidden;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.12)}
+@media (max-width:760px){.trust{grid-template-columns:1fr}}
+.trust-item{background:var(--navy);padding:30px;display:grid;grid-template-columns:48px 1fr;gap:18px;align-items:start}
+.trust-item .card-ico{background:rgba(69,179,236,.14);color:var(--sky)}
+.trust-item h3{font-size:1.18rem;margin-bottom:6px}
+.trust-item p{color:#c3d3ea}
+
+/* Cotización */
+.quote-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:16px}
+@media (max-width:1000px){.quote-grid{grid-template-columns:repeat(2,1fr)}}
+@media (max-width:520px){.quote-grid{grid-template-columns:1fr}}
+.q-card{background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:22px;display:grid;gap:10px;align-content:start}
+.q-card .card-ico{width:46px;height:46px}
+.q-card h3{font-size:1.1rem}
+.q-card .q-desc{font-size:.9rem;color:var(--muted)}
+.q-card .price{font-family:var(--font-title);font-weight:700;color:var(--ink);font-size:1.05rem}
+.q-card .price.tbd{color:var(--muted);font-weight:600;font-family:var(--font-text);font-size:.95rem}
+.q-card .btn{margin-top:4px;min-height:42px;font-size:.92rem}
+
+/* Contacto */
+.bases{display:grid;grid-template-columns:repeat(2,1fr);gap:20px}
+@media (max-width:760px){.bases{grid-template-columns:1fr}}
+.base{background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:28px;display:grid;gap:18px}
+.base-top{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.base h3{font-size:1.5rem}
+.base .pill{font-size:.78rem;font-weight:600;padding:.3em .7em;border-radius:999px;background:#e9f2fe;color:var(--blue-ink)}
+.base dl{margin:0;display:grid;gap:12px}
+.base dl div{display:grid;grid-template-columns:24px 1fr;gap:12px;align-items:start}
+.base dt svg{width:22px;height:22px;color:var(--blue)}
+.base dd{margin:0}
+.base dd small{display:block;color:var(--muted);font-size:.82rem}
+.base dd a{text-decoration:none;font-weight:600}
+.base-actions{display:flex;flex-wrap:wrap;gap:10px}
+
+/* Pie */
+footer{
+  color:#c3d3ea;padding:calc(var(--fade) + 24px) 0 32px;font-size:.95rem;
+  background:linear-gradient(180deg,var(--tint) 0,#3a76c8 calc(var(--fade) * .35),#0f2f66 calc(var(--fade) * .7),#06142e var(--fade),#06142e 100%);
+}
+.foot{display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:32px}
+@media (max-width:760px){.foot{grid-template-columns:1fr}}
+footer .brand{color:#fff}
+footer h4{color:#fff;font-size:.95rem;margin-bottom:10px;font-family:var(--font-text);font-weight:600;letter-spacing:0}
+footer p{margin-bottom:4px}
+.foot-slogan{font-style:italic;margin-top:12px;color:#9fb4d3}
+.foot-bottom{margin-top:40px;padding-top:20px;border-top:1px solid rgba(255,255,255,.1);display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px}
+.foot-bottom button{background:none;border:0;padding:0;color:#c3d3ea;text-decoration:underline;text-underline-offset:3px}
+
+/* =========================================================
+   7. PANEL / MODAL DE VIDRIO
+   ========================================================= */
+.overlay{
+  position:fixed;inset:0;z-index:60;display:grid;place-items:center;padding:20px;
+  background:rgba(3,10,26,.55);
+  opacity:0;visibility:hidden;transition:opacity .3s var(--ease),visibility .3s;
+}
+.overlay.open{opacity:1;visibility:visible}
+.panel{
+  width:min(640px,100%);max-height:min(860px,calc(100vh - 40px));max-height:min(860px,calc(100dvh - 40px));
+  border-radius:28px;color:#fff;display:flex;flex-direction:column;overflow:hidden;
+  transform:translateY(14px) scale(.98);transition:transform .35s var(--ease);
+}
+.overlay.open .panel{transform:none}
+.panel[hidden]{display:none}
+.panel-head{display:flex;align-items:center;gap:12px;padding:20px 22px 14px}
+.panel-head h2{font-size:1.35rem;font-weight:800}
+.panel-head .demo-tag{font-size:.7rem;font-weight:600;letter-spacing:.05em;text-transform:uppercase;padding:.25em .6em;border-radius:999px;border:1px solid rgba(255,255,255,.25);color:#c9d8ec}
+.x{margin-left:auto;width:42px;height:42px;border-radius:50%;border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.08);color:#fff;display:grid;place-items:center;transition:background-color .2s}
+.x:hover{background:rgba(255,255,255,.18)}
+.x svg{width:20px;height:20px}
+.panel-body{padding:4px 22px 22px;overflow-y:auto;overscroll-behavior:contain}
+.panel-foot{display:flex;gap:10px;justify-content:space-between;padding:14px 22px 20px;border-top:1px solid rgba(255,255,255,.1)}
+.panel-foot .btn{flex:0 0 auto}
+.panel-foot .foot-right{display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end;margin-left:auto}
+@media (max-width:420px){.panel-foot{flex-wrap:wrap}.panel-foot .foot-right{width:100%}.panel-foot .foot-right .btn{flex:1 1 auto}}
+@media (max-width:640px){
+  .overlay{padding:0;place-items:stretch}
+  .panel{width:100%;max-height:none;height:100%;border-radius:0}
+  .panel-head{padding-top:max(18px,env(safe-area-inset-top))}
+  .panel-foot{padding-bottom:max(16px,env(safe-area-inset-bottom))}
+}
+
+/* Barra de progreso */
+.progress{padding:0 22px 6px}
+.progress-meta{display:flex;justify-content:space-between;font-size:.82rem;color:#b9cae2;margin-bottom:8px}
+.progress-bar{height:6px;border-radius:99px;background:rgba(255,255,255,.12);overflow:hidden}
+.progress-bar span{display:block;height:100%;width:20%;border-radius:inherit;background:linear-gradient(90deg,var(--sky),#8fd3f7);transition:width .35s var(--ease)}
+
+/* Pasos del formulario */
+.fstep{display:none;gap:18px;padding-top:14px}
+.fstep.active{display:grid;animation:stepIn .3s var(--ease)}
+@keyframes stepIn{from{opacity:0;transform:translateX(10px)}to{opacity:1;transform:none}}
+.fstep h3{font-size:1.15rem;font-weight:700}
+.fstep .hint{color:#b9cae2;font-size:.9rem;margin-top:-10px}
+.field{display:grid;gap:8px}
+.field > label,.field > .lbl{font-weight:600;font-size:.92rem}
+.input{
+  width:100%;min-height:48px;padding:.75em .95em;border-radius:var(--radius-sm);
+  background:rgba(255,255,255,.95);color:var(--ink);border:1px solid rgba(255,255,255,.4);
+  transition:box-shadow .2s,border-color .2s;
+}
+.input::placeholder{color:#7b8aa0}
+.input:focus{outline:none;border-color:var(--sky);box-shadow:0 0 0 3px rgba(69,179,236,.45)}
+textarea.input{min-height:96px;resize:vertical}
+.field-err{color:#ffc2b3;font-size:.86rem;min-height:0}
+.input[aria-invalid="true"]{border-color:#ff8f75;box-shadow:0 0 0 3px rgba(255,120,90,.3)}
+
+/* Opciones tipo "chip" y tarjetas seleccionables (radio/checkbox) */
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.opt{position:relative}
+.opt input{position:absolute;opacity:0;inset:0;margin:0;cursor:pointer}
+.opt .face{
+  display:flex;align-items:center;gap:10px;min-height:46px;padding:.6em 1em;border-radius:999px;
+  background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.22);
+  transition:background-color .2s,border-color .2s,transform .2s var(--ease);font-weight:500;
+}
+.opt:hover .face{background:rgba(255,255,255,.12)}
+.opt input:checked + .face{background:rgba(69,179,236,.22);border-color:var(--sky);box-shadow:inset 0 0 0 1px var(--sky)}
+.opt input:focus-visible + .face{outline:3px solid var(--sky);outline-offset:2px}
+.tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px}
+.tiles .face{flex-direction:column;align-items:flex-start;gap:8px;border-radius:var(--radius-sm);padding:14px;height:100%}
+.tiles .face svg{width:30px;height:30px;stroke:#cfe6fb}
+.tiles .face strong{font-weight:600}
+.tiles .face small{color:#b9cae2;font-size:.8rem;line-height:1.3}
+.check .face{border-radius:var(--radius-sm);width:100%}
+.check .face::before{content:"";width:20px;height:20px;flex:none;border-radius:6px;border:1.5px solid rgba(255,255,255,.55);transition:background-color .2s}
+.check input:checked + .face::before{background:var(--sky) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23081a3a' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12l5 5L20 7'/%3E%3C/svg%3E") center/14px no-repeat;border-color:var(--sky)}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media (max-width:520px){.grid-2{grid-template-columns:1fr}}
+
+/* Contador de ambientes */
+.stepper{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.22);border-radius:999px;padding:4px}
+.stepper button{width:40px;height:40px;border-radius:50%;border:0;background:rgba(255,255,255,.12);color:#fff;font-size:1.3rem;line-height:1}
+.stepper button:hover{background:rgba(255,255,255,.2)}
+.stepper output{min-width:64px;text-align:center;font-weight:600}
+
+/* Calendario simple */
+.cal{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.18);border-radius:var(--radius-sm);padding:12px}
+.cal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.cal-head strong{font-family:var(--font-title);text-transform:capitalize}
+.cal-head button{width:38px;height:38px;border-radius:50%;border:1px solid rgba(255,255,255,.2);background:transparent;color:#fff;display:grid;place-items:center}
+.cal-head button:disabled{opacity:.3;cursor:not-allowed}
+.cal-head svg{width:18px;height:18px}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;text-align:center}
+.cal-dow{font-size:.75rem;color:#9fb4d3;padding:4px 0;font-weight:600}
+.cal-day{aspect-ratio:1;max-height:44px;border-radius:10px;border:1px solid transparent;background:transparent;color:#fff;font-size:.92rem;transition:background-color .15s}
+.cal-day:hover:not(:disabled){background:rgba(255,255,255,.14)}
+.cal-day:disabled{color:rgba(255,255,255,.25);cursor:not-allowed}
+.cal-day.today{border-color:rgba(255,255,255,.35)}
+.cal-day[aria-pressed="true"]{background:var(--sky);color:var(--navy);font-weight:700}
+
+/* Resumen */
+.summary{display:grid;border-radius:var(--radius-sm);overflow:hidden;border:1px solid rgba(255,255,255,.16)}
+.summary div{display:grid;grid-template-columns:150px 1fr;gap:12px;padding:12px 14px;background:rgba(255,255,255,.05)}
+.summary div:nth-child(even){background:rgba(255,255,255,.09)}
+.summary dt{color:#b9cae2;font-size:.9rem}
+.summary dd{margin:0;font-weight:600}
+@media (max-width:420px){.summary div{grid-template-columns:1fr;gap:2px}}
+.note{font-size:.86rem;color:#b9cae2}
+
+/* Pantalla de éxito */
+.success{text-align:center;display:grid;gap:14px;justify-items:center;padding:16px 0}
+.success-ico{width:68px;height:68px;border-radius:50%;display:grid;place-items:center;background:rgba(69,179,236,.2);border:1px solid var(--sky)}
+.success-ico svg{width:34px;height:34px;stroke:var(--sky)}
+.code{font-family:var(--font-title);font-size:2rem;font-weight:800;letter-spacing:.06em;padding:.2em .7em;border-radius:14px;background:rgba(255,255,255,.08);border:1px dashed rgba(255,255,255,.35)}
+
+/* =========================================================
+   8. SEGUIMIENTO
+   ========================================================= */
+.track-form{display:flex;gap:10px}
+.track-form .input{text-transform:uppercase;letter-spacing:.05em;font-weight:600}
+.order{margin-top:18px;border-radius:var(--radius);background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.16);padding:18px;display:grid;gap:16px}
+.order[hidden]{display:none}
+.order-top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap}
+.order-top small{display:block;color:#9fb4d3;font-size:.78rem;text-transform:uppercase;letter-spacing:.06em;font-weight:600}
+.order-top strong{font-family:var(--font-title);font-size:1.25rem}
+.route{display:flex;align-items:center;gap:8px;font-weight:600}
+.route svg{width:18px;height:18px;color:var(--sky)}
+.eta{text-align:right}
+.timeline{list-style:none;margin:0;padding:0;display:grid}
+.tl{position:relative;display:grid;grid-template-columns:28px 1fr;gap:12px;padding-bottom:14px}
+.tl:last-child{padding-bottom:0}
+.tl::before{content:"";position:absolute;left:13px;top:28px;bottom:-2px;width:2px;background:rgba(255,255,255,.15)}
+.tl:last-child::before{display:none}
+.tl.done::before{background:var(--sky)}
+.dot{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;border:2px solid rgba(255,255,255,.25);background:var(--navy);position:relative;z-index:1;transition:background-color .3s,border-color .3s}
+.dot svg{width:15px;height:15px;stroke:var(--navy);opacity:0;transition:opacity .2s}
+.tl.done .dot{background:var(--sky);border-color:var(--sky)}
+.tl.done .dot svg{opacity:1}
+.tl.current .dot{border-color:var(--gold);background:var(--gold);animation:pulse 1.6s ease-in-out infinite}
+.tl.current .dot::after{content:"";width:8px;height:8px;border-radius:50%;background:var(--navy)}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(242,163,58,.55)}50%{box-shadow:0 0 0 8px rgba(242,163,58,0)}}
+.tl .tl-t{font-weight:600;padding-top:3px;transition:color .3s}
+.tl .tl-s{font-size:.86rem;color:#b9cae2}
+.tl.pending .tl-t{color:rgba(255,255,255,.4)}
+.tl.pending .tl-s{display:none}
+.tl .tl-time{font-size:.78rem;color:#9fb4d3;margin-left:6px;font-weight:500}
+.stage{display:grid;gap:12px}
+.stage:empty{display:none}
+.map{border-radius:var(--radius-sm);overflow:hidden;border:1px solid rgba(255,255,255,.16);background:#0b2350}
+.map svg{width:100%;height:auto}
+.eta-box{display:flex;align-items:center;gap:12px;padding:14px;border-radius:var(--radius-sm);background:rgba(242,163,58,.14);border:1px solid rgba(242,163,58,.4)}
+.eta-box svg{width:26px;height:26px;stroke:var(--gold);flex:none}
+.eta-box strong{display:block}
+.proof{display:grid;gap:10px}
+.proof figure{margin:0;border-radius:var(--radius-sm);overflow:hidden;border:1px solid rgba(255,255,255,.16)}
+.proof figcaption{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;padding:10px 14px;background:rgba(255,255,255,.07);font-size:.9rem}
+.order-actions{display:flex;flex-wrap:wrap;gap:10px;justify-content:space-between;align-items:center}
+.demo-note{font-size:.78rem;color:#9fb4d3}
+
+/* Mis pedidos */
+.my-empty{text-align:center;display:grid;gap:12px;justify-items:center;padding:18px 6px 8px}
+.my-empty .success-ico{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.25)}
+.my-empty .success-ico svg{stroke:#cfe6fb}
+.my-empty h3{font-size:1.2rem}
+.my-empty .row{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:6px}
+.my-list{display:grid;gap:10px}
+.my-item{display:flex;align-items:center;gap:14px;width:100%;text-align:left;padding:14px 16px;border-radius:var(--radius-sm);background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.18);color:#fff;transition:background-color .2s}
+.my-item:hover{background:rgba(255,255,255,.13)}
+.my-item .ico{width:42px;height:42px;flex:none;border-radius:12px;display:grid;place-items:center;background:rgba(69,179,236,.18)}
+.my-item .ico svg{width:22px;height:22px;stroke:#cfe6fb}
+.my-item strong{display:block;font-family:var(--font-title);letter-spacing:.03em}
+.my-item small{display:block;color:#b9cae2;font-size:.85rem}
+.my-item .st{margin-left:auto;font-size:.8rem;font-weight:600;padding:.3em .7em;border-radius:999px;background:rgba(69,179,236,.18);color:#cfeaff;white-space:nowrap}
+.my-item .st.ok{background:rgba(31,191,107,.2);color:#bff3d6}
+.my-head{display:flex;justify-content:space-between;align-items:center;margin:4px 0 12px}
+.my-head h3{font-size:1.05rem}
+.code-alt{margin-top:18px;border-top:1px solid rgba(255,255,255,.12);padding-top:14px}
+.code-alt summary{cursor:pointer;color:#cfe6fb;font-weight:600;font-size:.92rem;list-style:none}
+.code-alt summary::-webkit-details-marker{display:none}
+.code-alt summary::after{content:" +";color:var(--sky)}
+.code-alt[open] summary::after{content:" −"}
+.code-alt .track-form{margin-top:12px}
+.link-back{display:inline-flex;align-items:center;gap:6px;background:none;border:0;padding:0;color:#cfe6fb;font-weight:600;font-size:.9rem}
+.link-back svg{width:18px;height:18px}
+
+/* Notificación tipo celular */
+.toast{
+  position:fixed;z-index:90;top:max(14px,env(safe-area-inset-top));left:50%;
+  width:min(420px,calc(100% - 24px));border-radius:22px;padding:12px 14px;color:#fff;
+  display:grid;grid-template-columns:40px 1fr auto;gap:12px;align-items:center;
+  transform:translate(-50%,-140%);transition:transform .45s cubic-bezier(.34,1.45,.5,1);
+  background:linear-gradient(180deg,rgba(30,60,115,.78),rgba(14,38,82,.78));
+}
+.toast.show{transform:translate(-50%,0)}
+.toast .app{width:40px;height:40px;border-radius:11px;display:grid;place-items:center;background:linear-gradient(160deg,var(--sky),var(--blue))}
+.toast .app svg{width:22px;height:22px}
+.toast b{display:block;font-size:.92rem}
+.toast span{font-size:.9rem;color:#dbe7f7}
+.toast small{align-self:start;font-size:.75rem;color:#b9cae2}
+.toast .x{width:32px;height:32px;margin:0}
+
+/* Diálogo pequeño (elegir base / privacidad) */
+.mini{width:min(460px,100%)}
+@media (max-width:640px){.overlay.mini-wrap{padding:16px;place-items:center}.overlay.mini-wrap .panel{height:auto;border-radius:24px}}
+.base-pick{display:grid;gap:10px}
+.base-pick a{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px;border-radius:var(--radius-sm);text-decoration:none;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.2);transition:background-color .2s}
+.base-pick a:hover{background:rgba(255,255,255,.14)}
+.base-pick small{display:block;color:#b9cae2}
+.base-pick svg{width:22px;height:22px;color:#6be39e;flex:none}
+.privacy p{color:#dbe7f7;margin-bottom:12px}
+.privacy ul{margin:0 0 12px;padding-left:20px;color:#dbe7f7}
+
+/* =========================================================
+   9. ANIMACIONES AL HACER SCROLL
+   ========================================================= */
+.reveal{opacity:0;transform:translateY(16px);transition:opacity .4s var(--ease),transform .4s var(--ease)}
+.reveal.in{opacity:1;transform:none}
+.hero .reveal{transition-duration:.6s}
+
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  *,*::before,*::after{animation-duration:.01ms !important;animation-iteration-count:1 !important;transition-duration:.01ms !important}
+  .reveal{opacity:1;transform:none}
+  .tl.current .dot{animation:none;box-shadow:0 0 0 4px rgba(242,163,58,.35)}
+}
+</style>
+</head>
+<body>
+
+<!-- ============ ÍCONOS (se reutilizan con <use>) ============ -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="i-truck" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M2 7h11v9H2zM13 10h4l3 3v3h-7z"/><circle cx="6" cy="17.5" r="1.8"/><circle cx="17" cy="17.5" r="1.8"/></symbol>
+    <symbol id="i-box" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7.5 12 3l9 4.5v9L12 21l-9-4.5z"/><path d="M3 7.5 12 12l9-4.5M12 12v9M7.5 5.2l9 4.5"/></symbol>
+    <symbol id="i-home" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11 12 4l9 7"/><path d="M5 10v10h14V10"/><path d="M10 20v-5h4v5"/></symbol>
+    <symbol id="i-pin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></symbol>
+    <symbol id="i-route" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="18" r="2.5"/><circle cx="18" cy="6" r="2.5"/><path d="M8.5 18H15a3 3 0 0 0 0-6H9a3 3 0 0 1 0-6h6.5"/></symbol>
+    <symbol id="i-phone" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3h4l2 5-2.5 1.5a11 11 0 0 0 6 6L16 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 5a2 2 0 0 1 2-2z"/></symbol>
+    <symbol id="i-user" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></symbol>
+    <symbol id="i-cash" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="6" width="19" height="12" rx="2"/><circle cx="12" cy="12" r="2.6"/><path d="M6 9.5v.01M18 14.5v.01"/></symbol>
+    <symbol id="i-camera" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></symbol>
+    <symbol id="i-chat" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16v11H9l-5 4z"/><path d="M8 10h8M8 13h5"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7"/></symbol>
+    <symbol id="i-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></symbol>
+    <symbol id="i-left" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></symbol>
+    <symbol id="i-right" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></symbol>
+    <symbol id="i-x" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></symbol>
+    <symbol id="i-menu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></symbol>
+    <symbol id="i-clock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+    <symbol id="i-envelope" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="12" rx="1.5"/><path d="m3.5 7 8.5 6 8.5-6"/></symbol>
+    <symbol id="i-box-s" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M7 10.5 12 8l5 2.5v5L12 18l-5-2.5z"/><path d="M7 10.5 12 13l5-2.5M12 13v5"/></symbol>
+    <symbol id="i-box-l" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M2 7 12 2l10 5v10l-10 5-10-5z"/><path d="M2 7l10 5 10-5M12 12v10"/></symbol>
+    <symbol id="i-special" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9h12v10H3zM15 12h3l3 3v4h-6"/><path d="M6 9V6h6v3"/></symbol>
+    <symbol id="i-wa" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.2-.4.7-1.4.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.7 11.8 11.8 0 0 0 4.5 4c1.7.7 2.3.8 3.1.6.5-.1 1.5-.6 1.7-1.2.2-.6.2-1.1.2-1.2-.1-.1-.3-.2-.5-.3z"/></symbol>
+  </defs>
+</svg>
+
+<a class="sr-only" href="#servicios">Saltar al contenido</a>
+
+<!-- ============ 1. NAVEGACIÓN ============ -->
+<header class="nav glass" id="nav">
+  <a class="brand" href="#inicio" aria-label="Transporte El Elyon, ir al inicio">
+    <span class="brand-mark"><svg aria-hidden="true"><use href="#i-truck"/></svg></span>
+    <span>El Elyon<small>Transporte</small></span>
+  </a>
+  <button class="nav-toggle" id="navToggle" aria-expanded="false" aria-controls="navLinks" aria-label="Abrir menú">
+    <svg aria-hidden="true"><use href="#i-menu"/></svg>
+  </button>
+  <ul class="nav-links" id="navLinks">
+    <li><a href="#servicios">Servicios</a></li>
+    <li><a href="#inicio" data-open="track">Seguimiento</a></li>
+    <li><a href="#seguridad">Seguridad</a></li>
+    <li><a href="#contacto">Contacto</a></li>
+  </ul>
+  <button class="btn btn-wa" data-wa-pick="Hola, quiero consultar por un envío, encomienda o mudanza." aria-label="Escribinos por WhatsApp">
+    <svg aria-hidden="true"><use href="#i-wa"/></svg><span>Escribinos</span>
+  </button>
+</header>
+
+<main>
+<!-- ============ 2. INICIO ============ -->
+<section class="hero" id="inicio" aria-labelledby="heroTitle">
+  <div class="wrap hero-inner">
+    <span class="eyebrow reveal">Goya · Resistencia</span>
+    <h1 id="heroTitle" class="reveal">Tu carga, <em>nuestro compromiso.</em></h1>
+    <p class="hero-sub reveal">Paquetería, encomiendas y mudanzas entre Goya y Resistencia, dentro y fuera de la ciudad.</p>
+
+    <h2 class="hero-q reveal">¿Qué necesitás hoy?</h2>
+    <div class="choices">
+      <button class="choice glass reveal" data-open="send" aria-haspopup="dialog">
+        <span class="choice-ico"><svg aria-hidden="true"><use href="#i-box"/></svg></span>
+        <span class="txt"><h3>Enviar un paquete</h3><p>Lo retiramos y lo llevamos, con contrarreembolso si querés.</p></span>
+        <span class="go">Empezar <svg aria-hidden="true"><use href="#i-arrow"/></svg></span>
+      </button>
+      <button class="choice glass reveal" data-open="move" aria-haspopup="dialog">
+        <span class="choice-ico"><svg aria-hidden="true"><use href="#i-home"/></svg></span>
+        <span class="txt"><h3>Mudanza</h3><p>Contanos qué hay que mover y te pasamos presupuesto.</p></span>
+        <span class="go">Pedir presupuesto <svg aria-hidden="true"><use href="#i-arrow"/></svg></span>
+      </button>
+      <button class="choice glass star reveal" data-open="track" aria-haspopup="dialog">
+        <span class="choice-ico"><svg aria-hidden="true"><use href="#i-route"/></svg></span>
+        <span class="txt"><h3>Seguir mi pedido</h3><p>Mirá en qué etapa está tu envío, paso a paso.</p></span>
+        <span class="go">Ver seguimiento <svg aria-hidden="true"><use href="#i-arrow"/></svg></span>
+      </button>
+    </div>
+
+    <div class="hero-contact reveal">
+      <span>Goya: <a href="https://wa.me/5493777391240?text=Hola%2C%20quiero%20consultar%20por%20un%20env%C3%ADo%2C%20encomienda%20o%20mudanza.">Gonzalo · 3777 391240</a></span>
+      <span>Resistencia: <a href="https://wa.me/5493624562017?text=Hola%2C%20quiero%20consultar%20por%20un%20env%C3%ADo%2C%20encomienda%20o%20mudanza.">Daniel · 3624 562017</a></span>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 6. SERVICIOS ============ -->
+<section class="sec sec-white" id="servicios" aria-labelledby="servTitle">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="kicker">Servicios</span>
+      <h2 id="servTitle">Lo que hacemos, bien hecho.</h2>
+      <p>Buenos precios, responsabilidad y confiabilidad en cada viaje.</p>
+    </div>
+    <div class="cards">
+      <article class="card reveal">
+        <span class="card-ico"><svg aria-hidden="true"><use href="#i-box"/></svg></span>
+        <h3>Paquetería</h3>
+        <p>Envíos dentro y fuera de la ciudad. Retiramos tu paquete y lo llevamos a destino.</p>
+        <button class="link-arrow" data-open="send">Enviar un paquete <svg aria-hidden="true"><use href="#i-arrow"/></svg></button>
+      </article>
+      <article class="card reveal">
+        <span class="card-ico"><svg aria-hidden="true"><use href="#i-truck"/></svg></span>
+        <h3>Reparto de encomiendas</h3>
+        <p>Repartimos tus encomiendas y, si lo necesitás, cobramos al entregar.</p>
+        <button class="link-arrow" data-open="send">Coordinar un reparto <svg aria-hidden="true"><use href="#i-arrow"/></svg></button>
+      </article>
+      <article class="card reveal">
+        <span class="card-ico"><svg aria-hidden="true"><use href="#i-home"/></svg></span>
+        <h3>Mudanzas</h3>
+        <p>Departamentos, casas y oficinas. Te pasamos presupuesto según lo que haya que llevar.</p>
+        <button class="link-arrow" data-open="move">Pedir presupuesto <svg aria-hidden="true"><use href="#i-arrow"/></svg></button>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 7. CÓMO FUNCIONA ============ -->
+<section class="sec" id="como" aria-labelledby="howTitle">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="kicker">Cómo funciona</span>
+      <h2 id="howTitle">Tres pasos. Sin vueltas.</h2>
+    </div>
+    <ol class="steps">
+      <li class="step reveal"><span class="step-n">1<span>.</span></span><h3>Pedís</h3><p>Desde esta web o por WhatsApp, en un par de minutos.</p></li>
+      <li class="step reveal"><span class="step-n">2<span>.</span></span><h3>Retiramos</h3><p>Pasamos a buscar tu carga el día y en la franja que elegiste.</p></li>
+      <li class="step reveal"><span class="step-n">3<span>.</span></span><h3>Entregamos y te avisamos</h3><p>Llevamos tu envío a destino y te avisamos cuando está entregado.</p></li>
+    </ol>
+  </div>
+</section>
+
+<!-- ============ 8. SEGURIDAD Y CONFIANZA ============ -->
+<section class="sec sec-dark" id="seguridad" aria-labelledby="secTitle">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="kicker">Seguridad y confianza</span>
+      <h2 id="secTitle">Tu carga, en buenas manos.</h2>
+      <p>Rápido, seguro y con gente que da la cara.</p>
+    </div>
+    <div class="trust reveal">
+      <div class="trust-item"><span class="card-ico"><svg aria-hidden="true"><use href="#i-cash"/></svg></span><div><h3>Contrarreembolso</h3><p>Cobramos al entregar y te rendimos el dinero.</p></div></div>
+      <div class="trust-item"><span class="card-ico"><svg aria-hidden="true"><use href="#i-camera"/></svg></span><div><h3>Foto de entrega</h3><p>Cada entrega queda registrada con foto.</p></div></div>
+      <div class="trust-item"><span class="card-ico"><svg aria-hidden="true"><use href="#i-route"/></svg></span><div><h3>Seguimiento</h3><p>Sabés en qué etapa está tu envío.</p></div></div>
+      <div class="trust-item"><span class="card-ico"><svg aria-hidden="true"><use href="#i-user"/></svg></span><div><h3>Gente que responde</h3><p>Te atienden Gonzalo y Daniel, personas con nombre.</p></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 9. COTIZACIÓN ============ -->
+<section class="sec sec-white" id="cotizar" aria-labelledby="quoteTitle">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="kicker">Cotización</span>
+      <h2 id="quoteTitle">Cotizá tu envío.</h2>
+      <p>Elegí el tamaño y escribinos: te respondemos con el precio.</p>
+    </div>
+    <div class="quote-grid" id="quoteGrid"><!-- se completa desde CONFIG.precios --></div>
+  </div>
+</section>
+
+<!-- ============ 10. CONTACTO Y COBERTURA ============ -->
+<section class="sec" id="contacto" aria-labelledby="contactTitle">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="kicker">Contacto y cobertura</span>
+      <h2 id="contactTitle">Dos bases, una misma forma de trabajar.</h2>
+      <p>Consultanos por la base que te quede más cerca.</p>
+    </div>
+    <div class="bases" id="bases"><!-- se completa desde CONFIG.bases --></div>
+  </div>
+</section>
+</main>
+
+<!-- ============ 11. PIE ============ -->
+<footer>
+  <div class="wrap">
+    <div class="foot">
+      <div>
+        <a class="brand" href="#inicio"><span class="brand-mark"><svg aria-hidden="true"><use href="#i-truck"/></svg></span><span>Transporte El Elyon</span></a>
+        <p class="foot-slogan">“Tu carga, nuestro compromiso”</p>
+      </div>
+      <div>
+        <h4>Goya</h4>
+        <p>9 de Julio 2557, Goya, Corrientes</p>
+        <p>Gonzalo · <a href="https://wa.me/5493777391240?text=Hola%2C%20quiero%20consultar%20por%20un%20env%C3%ADo%2C%20encomienda%20o%20mudanza.">3777 391240</a></p>
+      </div>
+      <div>
+        <h4>Resistencia</h4>
+        <p>Avda. McLean 2650, Resistencia, Chaco</p>
+        <p>Daniel · <a href="https://wa.me/5493624562017?text=Hola%2C%20quiero%20consultar%20por%20un%20env%C3%ADo%2C%20encomienda%20o%20mudanza.">3624 562017</a></p>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <span>© 2026 Transporte El Elyon</span>
+      <button type="button" data-open="privacy">Política de privacidad</button>
+    </div>
+  </div>
+</footer>
+
+<!-- =========================================================
+     PANELES (un solo overlay; se muestra un panel por vez)
+     ========================================================= -->
+<div class="overlay" id="overlay" aria-hidden="true">
+
+  <!-- 3) ENVIAR UN PAQUETE -->
+  <section class="panel glass-dark" id="p-send" role="dialog" aria-modal="true" aria-labelledby="sendTitle" hidden>
+    <div class="panel-head">
+      <h2 id="sendTitle">Enviar un paquete</h2>
+      <button class="x" data-close aria-label="Cerrar"><svg aria-hidden="true"><use href="#i-x"/></svg></button>
+    </div>
+    <div class="progress" id="sendProgress">
+      <div class="progress-meta"><span id="sendStepLabel">Paso 1 de 5</span><span id="sendStepName">Origen y destino</span></div>
+      <div class="progress-bar" role="progressbar" aria-valuemin="1" aria-valuemax="5" aria-valuenow="1" aria-label="Progreso"><span></span></div>
+    </div>
+    <form class="panel-body" id="sendForm" novalidate>
+      <!-- Paso 1 -->
+      <div class="fstep active" data-name="Origen y destino">
+        <h3>¿Desde dónde y hacia dónde?</h3>
+        <fieldset class="field" style="border:0;padding:0;margin:0">
+          <legend class="lbl" style="font-weight:600;font-size:.92rem;margin-bottom:8px">Origen (dónde lo retiramos)</legend>
+          <div class="chips" data-city="origen"></div>
+          <input class="input" id="origenOtra" placeholder="Escribí la localidad" hidden aria-label="Otra localidad de origen">
+          <p class="field-err" id="errOrigen" role="alert"></p>
+        </fieldset>
+        <fieldset class="field" style="border:0;padding:0;margin:0">
+          <legend class="lbl" style="font-weight:600;font-size:.92rem;margin-bottom:8px">Destino</legend>
+          <div class="chips" data-city="destino"></div>
+          <input class="input" id="destinoOtra" placeholder="Escribí la localidad" hidden aria-label="Otra localidad de destino">
+          <p class="field-err" id="errDestino" role="alert"></p>
+        </fieldset>
+      </div>
+      <!-- Paso 2 -->
+      <div class="fstep" data-name="Tamaño">
+        <h3>¿Qué tamaño tiene?</h3>
+        <div class="tiles" id="sizeTiles" role="radiogroup" aria-label="Tamaño del paquete"></div>
+        <p class="field-err" id="errSize" role="alert"></p>
+      </div>
+      <!-- Paso 3 -->
+      <div class="fstep" data-name="Retiro">
+        <h3>¿Cuándo lo retiramos?</h3>
+        <div class="field"><span class="lbl">Día de retiro</span><div class="cal" id="sendCal"></div><p class="field-err" id="errSendDate" role="alert"></p></div>
+        <div class="field"><span class="lbl">Franja horaria</span><div class="chips" id="sendSlots" role="radiogroup" aria-label="Franja horaria de retiro"></div><p class="field-err" id="errSendSlot" role="alert"></p></div>
+      </div>
+      <!-- Paso 4 -->
+      <div class="fstep" data-name="Tus datos">
+        <h3>Últimos datos</h3>
+        <div class="field">
+          <span class="lbl" id="codLbl">¿Cobro contra entrega (contrarreembolso)?</span>
+          <div class="chips" role="radiogroup" aria-labelledby="codLbl">
+            <label class="opt"><input type="radio" name="cod" value="no" checked><span class="face">No</span></label>
+            <label class="opt"><input type="radio" name="cod" value="si"><span class="face">Sí, cobrar al entregar</span></label>
+          </div>
+          <p class="hint" style="margin-top:0">Cobramos al entregar y te rendimos el dinero.</p>
+        </div>
+        <div class="field" id="codAmountField" hidden>
+          <label for="codAmount">Monto a cobrar (opcional)</label>
+          <input class="input" id="codAmount" inputmode="numeric" placeholder="Ej: 25000">
+        </div>
+        <div class="grid-2">
+          <div class="field"><label for="sendName">Tu nombre</label><input class="input" id="sendName" autocomplete="name" placeholder="Nombre y apellido"><p class="field-err" id="errSendName" role="alert"></p></div>
+          <div class="field"><label for="sendPhone">Tu teléfono</label><input class="input" id="sendPhone" type="tel" autocomplete="tel" inputmode="tel" placeholder="Ej: 3777 123456"><p class="field-err" id="errSendPhone" role="alert"></p></div>
+        </div>
+      </div>
+      <!-- Paso 5 -->
+      <div class="fstep" data-name="Resumen">
+        <div id="sendSummaryWrap">
+          <h3 style="margin-bottom:14px">Revisá tu pedido</h3>
+          <dl class="summary" id="sendSummary"></dl>
+          <p class="note" style="margin-top:12px" id="sendDestNote"></p>
+        </div>
+        <div class="success" id="sendDone" hidden>
+          <span class="success-ico"><svg aria-hidden="true"><use href="#i-check"/></svg></span>
+          <h3>¡Pedido confirmado!</h3>
+          <p class="note" id="sendDoneNote"></p>
+          <p class="note" id="sendCodeLbl">Tu código de pedido:</p>
+          <span class="code" id="sendCode">EL-0000</span>
+          <p class="note">Guardalo para seguir tu envío.</p>
+        </div>
+      </div>
+    </form>
+    <div class="panel-foot" id="sendFoot">
+      <button class="btn btn-ghost" type="button" id="sendBack">Atrás</button>
+      <div class="foot-right">
+        <button class="btn btn-wa" type="button" id="sendWa" hidden><svg aria-hidden="true"><use href="#i-wa"/></svg> WhatsApp</button>
+        <button class="btn btn-primary" type="button" id="sendNext">Siguiente <svg aria-hidden="true"><use href="#i-arrow"/></svg></button>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4) MUDANZA -->
+  <section class="panel glass-dark" id="p-move" role="dialog" aria-modal="true" aria-labelledby="moveTitle" hidden>
+    <div class="panel-head">
+      <h2 id="moveTitle">Mudanza</h2>
+      <button class="x" data-close aria-label="Cerrar"><svg aria-hidden="true"><use href="#i-x"/></svg></button>
+    </div>
+    <div class="progress">
+      <div class="progress-meta"><span id="moveStepLabel">Paso 1 de 5</span><span id="moveStepName">Tipo</span></div>
+      <div class="progress-bar" role="progressbar" aria-valuemin="1" aria-valuemax="5" aria-valuenow="1" aria-label="Progreso"><span></span></div>
+    </div>
+    <form class="panel-body" id="moveForm" novalidate>
+      <!-- Paso 1 -->
+      <div class="fstep active" data-name="Tipo">
+        <h3>¿Qué vamos a mudar?</h3>
+        <div class="tiles" role="radiogroup" aria-label="Tipo de mudanza" id="moveTypes"></div>
+        <p class="field-err" id="errMoveType" role="alert"></p>
+        <div class="field">
+          <span class="lbl" id="ambLbl">Cantidad de ambientes</span>
+          <div class="stepper" aria-labelledby="ambLbl">
+            <button type="button" id="ambMinus" aria-label="Quitar un ambiente">−</button>
+            <output id="ambOut" aria-live="polite">2</output>
+            <button type="button" id="ambPlus" aria-label="Sumar un ambiente">+</button>
+          </div>
+        </div>
+        <div class="field">
+          <span class="lbl" id="moveBaseLbl">¿Qué base te queda más cerca?</span>
+          <div class="chips" role="radiogroup" aria-labelledby="moveBaseLbl">
+            <label class="opt"><input type="radio" name="moveBase" value="goya" checked><span class="face">Goya</span></label>
+            <label class="opt"><input type="radio" name="moveBase" value="resistencia"><span class="face">Resistencia</span></label>
+            <label class="opt"><input type="radio" name="moveBase" value="otra"><span class="face">Otra localidad</span></label>
+          </div>
+        </div>
+      </div>
+      <!-- Paso 2 -->
+      <div class="fstep" data-name="Direcciones">
+        <h3>¿Desde dónde y hacia dónde?</h3>
+        <div class="field"><label for="moveFrom">Dirección de origen</label><input class="input" id="moveFrom" autocomplete="street-address" placeholder="Calle, número y localidad"><p class="field-err" id="errMoveFrom" role="alert"></p></div>
+        <div class="field"><label for="moveTo">Dirección de destino</label><input class="input" id="moveTo" placeholder="Calle, número y localidad"><p class="field-err" id="errMoveTo" role="alert"></p></div>
+      </div>
+      <!-- Paso 3 -->
+      <div class="fstep" data-name="Fecha">
+        <h3>¿Cuándo te mudás?</h3>
+        <div class="field"><span class="lbl">Fecha</span><div class="cal" id="moveCal"></div><p class="field-err" id="errMoveDate" role="alert"></p></div>
+        <div class="field"><span class="lbl">Horario de inicio preferido</span><div class="chips" id="moveSlots" role="radiogroup" aria-label="Horario de inicio preferido"></div><p class="field-err" id="errMoveSlot" role="alert"></p></div>
+      </div>
+      <!-- Paso 4 -->
+      <div class="fstep" data-name="Detalles">
+        <h3>¿Necesitás algo más?</h3>
+        <div class="field" style="gap:10px">
+          <label class="opt check"><input type="checkbox" name="extra" value="Embalaje"><span class="face">Embalaje</span></label>
+          <label class="opt check"><input type="checkbox" name="extra" value="Desarme y armado de muebles"><span class="face">Desarme y armado de muebles</span></label>
+          <label class="opt check"><input type="checkbox" name="extra" value="Ayudantes extra"><span class="face">Ayudantes extra</span></label>
+        </div>
+        <div class="field"><label for="moveNotes">Contanos qué hay que llevar <span style="font-weight:400;color:#b9cae2">(opcional)</span></label><textarea class="input" id="moveNotes" placeholder="Ej: heladera, lavarropas, 2 camas, 10 cajas…"></textarea></div>
+        <div class="grid-2">
+          <div class="field"><label for="moveName">Tu nombre</label><input class="input" id="moveName" autocomplete="name" placeholder="Nombre y apellido"><p class="field-err" id="errMoveName" role="alert"></p></div>
+          <div class="field"><label for="movePhone">Tu teléfono</label><input class="input" id="movePhone" type="tel" autocomplete="tel" inputmode="tel" placeholder="Ej: 3624 123456"><p class="field-err" id="errMovePhone" role="alert"></p></div>
+        </div>
+      </div>
+      <!-- Paso 5 -->
+      <div class="fstep" data-name="Resumen">
+        <h3 style="margin-bottom:14px">Revisá tu pedido</h3>
+        <div id="moveSummaryWrap">
+          <dl class="summary" id="moveSummary"></dl>
+          <p class="note" style="margin-top:12px" id="moveDestNote"></p>
+        </div>
+        <div class="success" id="moveDone" hidden>
+          <span class="success-ico"><svg aria-hidden="true"><use href="#i-check"/></svg></span>
+          <h3>¡Pedido confirmado!</h3>
+          <p class="note" id="moveDoneNote"></p>
+          <p class="note" id="moveCodeLbl">Tu código de pedido:</p>
+          <span class="code" id="moveCode"></span>
+          <p class="note">Lo podés seguir en "Seguir mi pedido".</p>
+        </div>
+      </div>
+    </form>
+    <div class="panel-foot" id="moveFoot">
+      <button class="btn btn-ghost" type="button" id="moveBack">Atrás</button>
+      <div class="foot-right">
+        <button class="btn btn-wa" type="button" id="moveWa" hidden><svg aria-hidden="true"><use href="#i-wa"/></svg> WhatsApp</button>
+        <button class="btn btn-primary" type="button" id="moveNext">Siguiente <svg aria-hidden="true"><use href="#i-arrow"/></svg></button>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5) SEGUIR MI PEDIDO -->
+  <section class="panel glass-dark" id="p-track" role="dialog" aria-modal="true" aria-labelledby="trackTitle" hidden>
+    <div class="panel-head">
+      <h2 id="trackTitle">Seguir mi pedido</h2>
+      <span class="demo-tag" id="trackTag" hidden>Demostración</span>
+      <button class="x" data-close aria-label="Cerrar"><svg aria-hidden="true"><use href="#i-x"/></svg></button>
+    </div>
+    <div class="panel-body">
+      <!-- Mis pedidos: solo los hechos desde este dispositivo -->
+      <div id="myOrders"></div>
+
+      <details class="code-alt" id="codeAlt">
+        <summary>¿Te pasaron un código por WhatsApp?</summary>
+        <form class="track-form" id="trackForm" novalidate>
+          <label class="sr-only" for="trackCode">Código de pedido</label>
+          <input class="input" id="trackCode" autocomplete="off" spellcheck="false" maxlength="14" placeholder="Ej: EL-ABCD-1234">
+          <button class="btn btn-primary" type="button" id="trackBtn">Buscar</button>
+        </form>
+      </details>
+      <p class="field-err" id="errTrack" role="alert" style="margin-top:8px"></p>
+
+      <article class="order" id="order" hidden aria-labelledby="orderTitle">
+        <button class="link-back" type="button" id="backToList"><svg aria-hidden="true"><use href="#i-left"/></svg> Mis pedidos</button>
+        <div class="order-top">
+          <div>
+            <small id="orderTitle">Tu pedido</small>
+            <strong id="oCode"></strong>
+            <div class="route"><span id="oFrom">Goya</span><svg aria-hidden="true"><use href="#i-arrow"/></svg><span id="oTo">Resistencia</span></div>
+          </div>
+          <div class="eta"><small id="oEtaLbl">Hora estimada</small><strong id="oEta">--:--</strong></div>
+        </div>
+
+        <ol class="timeline" id="timeline" aria-live="polite"></ol>
+        <div class="stage" id="stage"></div>
+
+        <div class="order-actions">
+          <span class="demo-note" id="trackNote">Se actualiza sola cada pocos segundos.</span>
+          <button class="btn btn-ghost" type="button" id="trackReset" hidden>Reiniciar demostración</button>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <!-- Elegir base para WhatsApp -->
+  <section class="panel glass-dark mini" id="p-pick" role="dialog" aria-modal="true" aria-labelledby="pickTitle" hidden>
+    <div class="panel-head">
+      <h2 id="pickTitle">¿Con qué base querés hablar?</h2>
+      <button class="x" data-close aria-label="Cerrar"><svg aria-hidden="true"><use href="#i-x"/></svg></button>
+    </div>
+    <div class="panel-body"><div class="base-pick" id="pickList"></div></div>
+  </section>
+
+  <!-- Política de privacidad -->
+  <section class="panel glass-dark mini privacy" id="p-privacy" role="dialog" aria-modal="true" aria-labelledby="privTitle" hidden>
+    <div class="panel-head">
+      <h2 id="privTitle">Política de privacidad</h2>
+      <button class="x" data-close aria-label="Cerrar"><svg aria-hidden="true"><use href="#i-x"/></svg></button>
+    </div>
+    <div class="panel-body">
+      <p>Esta web no guarda tus datos ni los envía a ningún servidor.</p>
+      <p>En los formularios te pedimos:</p>
+      <ul>
+        <li>Nombre y teléfono, para poder contactarte.</li>
+        <li>Localidades, direcciones, fecha y franja horaria, para organizar el retiro, la entrega o la mudanza.</li>
+        <li>Si querés contrarreembolso y el monto, para cobrarlo al entregar.</li>
+      </ul>
+      <p>Al confirmar, se abre WhatsApp con un mensaje ya escrito. Vos decidís si lo enviás. Esos datos solo los usamos para responder tu pedido y no los compartimos con terceros.</p>
+      <p>Si querés que borremos tu conversación o tus datos, pedilo por WhatsApp a la base con la que hablaste.</p>
+    </div>
+  </section>
+</div>
+
+<!-- Notificación tipo celular -->
+<div class="toast glass" id="toast" role="status" aria-live="assertive" aria-hidden="true">
+  <span class="app"><svg aria-hidden="true"><use href="#i-truck"/></svg></span>
+  <div><b>Transporte El Elyon</b><span>Estamos afuera de tu domicilio</span></div>
+  <button class="x" type="button" id="toastClose" aria-label="Cerrar notificación"><svg aria-hidden="true"><use href="#i-x"/></svg></button>
+</div>
+
+<script>
+/* =========================================================
+   CONFIGURACIÓN: editá acá textos, teléfonos y precios
+   ========================================================= */
+const CONFIG = {
+  empresa: "Transporte El Elyon",
+  slogan: "Tu carga, nuestro compromiso",
+  bases: {
+    goya: {
+      ciudad: "Goya",
+      provincia: "Corrientes",
+      direccion: "9 de Julio 2557, Goya, Corrientes",
+      contacto: "Gonzalo",
+      telefono: "3777 391240",
+      whatsapp: "5493777391240",  // https://wa.me/5493777391240
+      llamada: "+5493777391240"    // tel:+5493777391240
+    },
+    resistencia: {
+      ciudad: "Resistencia",
+      provincia: "Chaco",
+      direccion: "Avda. McLean 2650, Resistencia, Chaco",
+      contacto: "Daniel",
+      telefono: "3624 562017",
+      whatsapp: "5493624562017",  // https://wa.me/5493624562017
+      llamada: "+5493624562017"    // tel:+5493624562017
+    }
+  },
+  // Si el origen es "Otra localidad", el pedido va a esta base:
+  baseOtra: "goya",
+
+  // Franjas horarias de retiro / inicio de mudanza
+  franjas: ["Mañana (8 a 12 h)", "Tarde (14 a 18 h)"],
+
+  // Tamaños de paquete (id, nombre, descripción corta, ícono)
+  tamanos: [
+    { id: "sobre",   nombre: "Sobre",         desc: "Documentos y papeles",       icono: "i-envelope" },
+    { id: "chica",   nombre: "Caja chica",    desc: "Como una caja de zapatos",   icono: "i-box-s" },
+    { id: "mediana", nombre: "Caja mediana",  desc: "Como una caja de microondas",icono: "i-box" },
+    { id: "grande",  nombre: "Caja grande",   desc: "Como una caja de TV",        icono: "i-box-l" },
+    { id: "especial",nombre: "Bulto especial",desc: "Muebles, bicis, piezas",     icono: "i-special" }
+  ],
+
+  /* PRECIOS: dejá "" para mostrar "Precio a consultar".
+     Ejemplo con precio: sobre: "$ 3.500"  */
+  precios: {
+    sobre:   "",
+    chica:   "",
+    mediana: "",
+    grande:  "",
+    mudanza: ""
+  },
+
+  /* SEGUIMIENTO REAL (Supabase). La clave anon es pública y es seguro que esté acá:
+     la base solo deja consultar un pedido por su código y crear pedidos nuevos.
+     NUNCA pongas acá la clave "service_role". */
+  supabase: {
+    url: "https://kynvsfupwtkngtxncfbf.supabase.co",
+    key: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt5bnZzZnVwd3Rrbmd0eG5jZmJmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTUxMzI2OTcsImV4cCI6MjExMDcwODY5N30.sV1fiBsChiH6_cAs-EoMcAzwdwc0lGr3l2GAJlsz3Qc",
+    bucket: "entregas",
+    refrescoMs: 5000            // cada cuánto se actualiza el seguimiento real
+  },
+
+  // Demostración de seguimiento
+  demo: {
+    codigoEjemplo: "EL-2048",
+    intervaloMs: 5500,          // tiempo entre estados (5 a 6 segundos)
+    receptorEjemplo: "María G.", // nombre de ejemplo para "Recibió"
+    origenEjemplo: "Goya",
+    destinoEjemplo: "Resistencia"
+  }
+};
+
+/* =========================================================
+   UTILIDADES
+   ========================================================= */
+const $  = (s, c = document) => c.querySelector(s);
+const $$ = (s, c = document) => [...c.querySelectorAll(s)];
+const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+const esc = s => String(s).replace(/[&<>"']/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[c]));
+const icon = id => `<svg aria-hidden="true"><use href="#${id}"/></svg>`;
+const waLink = (numero, mensaje) => `https://wa.me/${numero}?text=${encodeURIComponent(mensaje)}`;
+const enMarco = (() => { try { return window.self !== window.top; } catch (_) { return true; } })();
+const fmtFecha = d => d.toLocaleDateString("es-AR", { weekday: "long", day: "numeric", month: "long" });
+const fmtHora = d => d.toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit", hourCycle: "h23" });
+const cap = s => s.charAt(0).toUpperCase() + s.slice(1);
+
+/* =========================================================
+   CONEXIÓN CON LA BASE (Supabase, vía su API REST)
+   ========================================================= */
+const Api = (() => {
+  const { url, key, bucket } = CONFIG.supabase;
+  async function rpc(fn, body, ms = 6000) {
+    const ctrl = new AbortController();
+    const t = setTimeout(() => ctrl.abort(), ms);
+    try {
+      const r = await fetch(`${url}/rest/v1/rpc/${fn}`, {
+        method: "POST", signal: ctrl.signal,
+        headers: { apikey: key, Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
+        body: JSON.stringify(body)
+      });
+      if (!r.ok) throw new Error(`HTTP ${r.status}`);
+      return await r.json();
+    } finally { clearTimeout(t); }
+  }
+  return {
+    // Devuelve el código del pedido creado, o null si falló
+    async crearPedido(datos) {
+      try { const c = await rpc("crear_pedido_web", datos); return typeof c === "string" ? c : null; }
+      catch (_) { return null; }
+    },
+    // Devuelve { pedido } o { pedido: null } si no existe; lanza error si no hay conexión
+    async consultar(codigo) {
+      const rows = await rpc("consultar_pedido", { p_codigo: codigo });
+      return { pedido: Array.isArray(rows) && rows.length ? rows[0] : null };
+    },
+    fotoUrl: path => `${url}/storage/v1/object/public/${bucket}/${path.split("/").map(encodeURIComponent).join("/")}`
+  };
+})();
+
+/* =========================================================
+   CONTACTO Y COTIZACIÓN (generados desde CONFIG)
+   ========================================================= */
+function renderBases() {
+  $("#bases").innerHTML = Object.entries(CONFIG.bases).map(([key, b]) => `
+    <article class="base reveal">
+      <div class="base-top"><h3>${esc(b.ciudad)}</h3><span class="pill">${esc(b.provincia)}</span></div>
+      <dl>
+        <div><dt>${icon("i-pin")}<span class="sr-only">Dirección</span></dt><dd>${esc(b.direccion)}</dd></div>
+        <div><dt>${icon("i-user")}<span class="sr-only">Contacto</span></dt><dd>${esc(b.contacto)}<small>Te atiende personalmente</small></dd></div>
+        <div><dt>${icon("i-phone")}<span class="sr-only">Teléfono</span></dt><dd><a href="tel:${b.llamada}">${esc(b.telefono)}</a></dd></div>
+      </dl>
+      <div class="base-actions">
+        <a class="btn btn-wa"
+           href="${waLink(b.whatsapp, `Hola ${b.contacto}, quiero consultar por un envío, encomienda o mudanza.`)}">
+           ${icon("i-wa")} WhatsApp con ${esc(b.contacto)}</a>
+        <a class="btn btn-light" href="tel:${b.llamada}">${icon("i-phone")} Llamar</a>
+      </div>
+    </article>`).join("");
+}
+
+function renderQuotes() {
+  const items = [
+    ...CONFIG.tamanos.filter(t => t.id !== "especial").map(t => ({ id: t.id, nombre: t.nombre, desc: t.desc, icono: t.icono })),
+    { id: "mudanza", nombre: "Mudanza", desc: "Departamento, casa u oficina", icono: "i-home" }
+  ];
+  $("#quoteGrid").innerHTML = items.map(it => {
+    const p = CONFIG.precios[it.id];
+    return `
+    <article class="q-card reveal">
+      <span class="card-ico">${icon(it.icono)}</span>
+      <h3>${esc(it.nombre)}</h3>
+      <p class="q-desc">${esc(it.desc)}</p>
+      <p class="price ${p ? "" : "tbd"}">${p ? esc(p) : "Precio a consultar"}</p>
+      <button class="btn btn-wa" type="button" data-wa-pick="Hola, quiero consultar el precio de: ${esc(it.nombre)}.">${icon("i-wa")} Consultar</button>
+    </article>`;
+  }).join("");
+}
+
+/* =========================================================
+   PANELES (abrir / cerrar / foco)
+   ========================================================= */
+const overlay = $("#overlay");
+let lastFocus = null;
+let currentPanel = null;
+
+function openPanel(name) {
+  if (currentPanel) $(`#p-${currentPanel}`).hidden = true;
+  const panel = $(`#p-${name}`);
+  if (!panel) return;
+  if (!overlay.classList.contains("open")) lastFocus = document.activeElement;
+  currentPanel = name;
+  panel.hidden = false;
+  overlay.classList.toggle("mini-wrap", panel.classList.contains("mini"));
+  overlay.classList.add("open");
+  overlay.setAttribute("aria-hidden", "false");
+  document.body.classList.add("lock");
+  closeMenu();
+  // Foco en el primer elemento útil del panel
+  requestAnimationFrame(() => {
+    const target = panel.querySelector(".fstep.active input, .fstep.active button, #trackCode, .panel-body a, .x");
+    target && target.focus({ preventScroll: true });
+  });
+  if (name === "track") Tracker.onOpen();
+}
+
+function closePanel() {
+  if (!currentPanel) return;
+  const panel = $(`#p-${currentPanel}`);
+  overlay.classList.remove("open");
+  overlay.setAttribute("aria-hidden", "true");
+  document.body.classList.remove("lock");
+  if (currentPanel === "track") Tracker.pause();
+  const p = panel;
+  setTimeout(() => { if (!overlay.classList.contains("open")) p.hidden = true; }, 300);
+  currentPanel = null;
+  lastFocus && lastFocus.focus && lastFocus.focus();
+}
+
+// Botones que abren paneles
+document.addEventListener("click", e => {
+  const opener = e.target.closest("[data-open]");
+  if (opener) { e.preventDefault(); openPanel(opener.dataset.open); return; }
+  if (e.target.closest("[data-close]")) { closePanel(); return; }
+  const pick = e.target.closest("[data-wa-pick]");
+  if (pick) { openWaPicker(pick.dataset.waPick); return; }
+
+  // Enlaces internos (#servicios, #seguridad, #contacto…): scroll suave hecho en JS
+  // para que funcione igual en celular, computadora y vistas previas.
+  const link = e.target.closest('a[href^="#"]');
+  if (link) {
+    const target = document.getElementById(link.getAttribute("href").slice(1));
+    if (!target) return;
+    e.preventDefault();
+    closeMenu();
+    if (currentPanel) closePanel();
+    // Se apunta al contenido de la sección (no a su degradado de entrada)
+    const anchor = target.id === "inicio" ? target : (target.querySelector(".wrap") || target);
+    const top = anchor.getBoundingClientRect().top + window.scrollY - (target.id === "inicio" ? 0 : 104);
+    window.scrollTo({ top: Math.max(0, top), behavior: reduceMotion ? "auto" : "smooth" });
+    try { history.replaceState(null, "", "#" + target.id); } catch (_) { /* algunas vistas previas no lo permiten */ }
+  }
+});
+// Clic fuera del panel lo cierra
+overlay.addEventListener("click", e => { if (e.target === overlay) closePanel(); });
+
+// Teclado: Escape cierra, Tab queda dentro del panel
+document.addEventListener("keydown", e => {
+  if (!currentPanel) return;
+  if (e.key === "Escape") { closePanel(); return; }
+  if (e.key !== "Tab") return;
+  const panel = $(`#p-${currentPanel}`);
+  const f = $$('a[href],button:not([disabled]),input:not([type=hidden]):not([hidden]),textarea,select,[tabindex]:not([tabindex="-1"])', panel)
+    .filter(el => el.offsetParent !== null);
+  if (!f.length) return;
+  const first = f[0], last = f[f.length - 1];
+  if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+  else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+});
+
+/* Selector de base para WhatsApp (nav y cotización) */
+function openWaPicker(mensaje) {
+  $("#pickList").innerHTML = Object.values(CONFIG.bases).map(b => `
+    <a href="${waLink(b.whatsapp, mensaje)}">
+      <span><strong>${esc(b.ciudad)} · ${esc(b.contacto)}</strong><small>${esc(b.telefono)}</small></span>
+      ${icon("i-wa")}
+    </a>`).join("");
+  openPanel("pick");
+}
+
+/* Menú móvil */
+const navToggle = $("#navToggle"), navLinks = $("#navLinks");
+function closeMenu() { navLinks.classList.remove("open"); navToggle.setAttribute("aria-expanded", "false"); }
+navToggle.addEventListener("click", () => {
+  const open = navLinks.classList.toggle("open");
+  navToggle.setAttribute("aria-expanded", String(open));
+});
+navLinks.addEventListener("click", e => { if (e.target.closest("a")) closeMenu(); });
+
+/* =========================================================
+   CALENDARIO SIMPLE (no permite fechas pasadas)
+   ========================================================= */
+function createCalendar(el, onChange) {
+  const today = new Date(); today.setHours(0, 0, 0, 0);
+  let view = new Date(today.getFullYear(), today.getMonth(), 1);
+  let selected = null;
+  const dows = ["Lu", "Ma", "Mi", "Ju", "Vi", "Sá", "Do"];
+
+  function render() {
+    const y = view.getFullYear(), m = view.getMonth();
+    const firstDow = (new Date(y, m, 1).getDay() + 6) % 7; // lunes = 0
+    const days = new Date(y, m + 1, 0).getDate();
+    const isFirstMonth = y === today.getFullYear() && m === today.getMonth();
+    let cells = dows.map(d => `<span class="cal-dow" aria-hidden="true">${d}</span>`).join("");
+    cells += "<span></span>".repeat(firstDow);
+    for (let d = 1; d <= days; d++) {
+      const date = new Date(y, m, d);
+      const past = date < today;
+      const sel = selected && date.getTime() === selected.getTime();
+      const isToday = date.getTime() === today.getTime();
+      cells += `<button type="button" class="cal-day${isToday ? " today" : ""}" data-d="${d}"
+        ${past ? "disabled" : ""} aria-pressed="${sel}" aria-label="${fmtFecha(date)}${isToday ? " (hoy)" : ""}">${d}</button>`;
+    }
+    el.innerHTML = `
+      <div class="cal-head">
+        <button type="button" data-nav="-1" aria-label="Mes anterior" ${isFirstMonth ? "disabled" : ""}>${icon("i-left")}</button>
+        <strong aria-live="polite">${view.toLocaleDateString("es-AR", { month: "long", year: "numeric" })}</strong>
+        <button type="button" data-nav="1" aria-label="Mes siguiente">${icon("i-right")}</button>
+      </div>
+      <div class="cal-grid">${cells}</div>`;
+  }
+  el.addEventListener("click", e => {
+    const nav = e.target.closest("[data-nav]");
+    if (nav) { view = new Date(view.getFullYear(), view.getMonth() + Number(nav.dataset.nav), 1); render(); return; }
+    const day = e.target.closest(".cal-day");
+    if (day && !day.disabled) {
+      selected = new Date(view.getFullYear(), view.getMonth(), Number(day.dataset.d));
+      render();
+      el.querySelector(`[data-d="${day.dataset.d}"]`).focus();
+      onChange && onChange(selected);
+    }
+  });
+  render();
+  return {
+    get value() { return selected; },
+    reset() { selected = null; view = new Date(today.getFullYear(), today.getMonth(), 1); render(); }
+  };
+}
+
+/* =========================================================
+   ASISTENTE POR PASOS (lo usan Paquete y Mudanza)
+   ========================================================= */
+function createWizard({ form, back, next, label, name, bar, validate, onEnter, lastLabel, onFinish }) {
+  const steps = $$(".fstep", form);
+  let i = 0;
+  const nextHTML = next.innerHTML;
+  function show() {
+    steps.forEach((s, k) => s.classList.toggle("active", k === i));
+    label.textContent = `Paso ${i + 1} de ${steps.length}`;
+    name.textContent = steps[i].dataset.name;
+    bar.querySelector("span").style.width = `${((i + 1) / steps.length) * 100}%`;
+    bar.setAttribute("aria-valuenow", i + 1);
+    back.style.visibility = i === 0 ? "hidden" : "visible";
+    next.innerHTML = i === steps.length - 1 ? lastLabel : nextHTML;
+    next.classList.add("btn-primary");
+    onEnter && onEnter(i);
+    form.scrollTop = 0;
+  }
+  next.addEventListener("click", () => {
+    if (i < steps.length - 1) {
+      if (!validate(i)) return;
+      i++; show();
+      const f = steps[i].querySelector("input:not([hidden]),button");
+      f && f.focus({ preventScroll: true });
+    } else onFinish();
+  });
+  back.addEventListener("click", () => { if (i > 0) { i--; show(); } });
+  show();
+  return { reset() { i = 0; show(); }, get index() { return i; } };
+}
+
+// Muestra / limpia errores de un campo
+function setErr(id, msg, input) {
+  $(`#${id}`).textContent = msg || "";
+  if (input) input.setAttribute("aria-invalid", msg ? "true" : "false");
+  return !msg;
+}
+const phoneOk = v => v.replace(/\D/g, "").length >= 8;
+
+/* =========================================================
+   MIS PEDIDOS (los que se hicieron desde este dispositivo)
+   ========================================================= */
+const MyOrders = (() => {
+  const KEY = "elyon_mis_pedidos";
+  const ESTADO_CORTO = ["Recibido", "Retirado", "En viaje", "En tu ciudad", "Cerca", "Afuera", "Entregado"];
+  function list() {
+    try { const a = JSON.parse(localStorage.getItem(KEY) || "[]"); return Array.isArray(a) ? a : []; }
+    catch (_) { return []; }
+  }
+  function add(p) {
+    const a = list().filter(x => x.codigo !== p.codigo);
+    a.unshift({ ...p, creado: new Date().toISOString() });
+    try { localStorage.setItem(KEY, JSON.stringify(a.slice(0, 20))); } catch (_) {}
+  }
+  // Los pedidos ENTREGADOS salen de la lista
+  function remove(codigo) {
+    try { localStorage.setItem(KEY, JSON.stringify(list().filter(x => x.codigo !== codigo))); } catch (_) {}
+  }
+  function quitarDeLaVista(codigo) {
+    remove(codigo);
+    const it = $(`#myOrders [data-code="${CSS.escape(codigo)}"]`);
+    if (it) it.remove();
+    if (!$("#myOrders .my-item")) render();
+  }
+  function render() {
+    const box = $("#myOrders");
+    const a = list();
+    if (!a.length) {
+      box.innerHTML = `
+        <div class="my-empty">
+          <span class="success-ico">${icon("i-box")}</span>
+          <h3>Todavía no tenés pedidos</h3>
+          <p class="note">Cuando hagas un envío o pidas una mudanza, lo vas a ver acá y vas a poder seguirlo paso a paso.</p>
+          <div class="row">
+            <button class="btn btn-primary" type="button" data-open="send">${icon("i-box")} Enviar un paquete</button>
+            <button class="btn btn-ghost" type="button" data-open="move">${icon("i-home")} Mudanza</button>
+          </div>
+        </div>`;
+      return;
+    }
+    box.innerHTML = `
+      <div class="my-head"><h3>Mis pedidos</h3><span class="note">${a.length}</span></div>
+      <div class="my-list">${a.map(p => `
+        <button class="my-item" type="button" data-code="${esc(p.codigo)}">
+          <span class="ico">${icon(p.tipo === "Mudanza" ? "i-home" : "i-box")}</span>
+          <span><strong>${esc(p.codigo)}</strong><small>${esc(p.origen)} → ${esc(p.destino)}</small></span>
+          <span class="st" data-st="${esc(p.codigo)}">…</span>
+        </button>`).join("")}</div>`;
+    // Estado actual de cada pedido (se consulta en la base)
+    a.forEach(async p => {
+      if (p.prueba) {
+        const el = box.querySelector(`[data-st="${CSS.escape(p.codigo)}"]`);
+        if (el) el.textContent = "Prueba";
+        return;
+      }
+      try {
+        const { pedido } = await Api.consultar(p.codigo);
+        if (pedido && pedido.estado === 6) { quitarDeLaVista(p.codigo); return; }
+        const el = box.querySelector(`[data-st="${CSS.escape(p.codigo)}"]`);
+        if (el) {
+          el.textContent = pedido ? ESTADO_CORTO[pedido.estado] : "Sin datos";
+          el.classList.toggle("ok", !!pedido && pedido.estado === 6);
+        }
+      } catch (_) {
+        const el = box.querySelector(`[data-st="${CSS.escape(p.codigo)}"]`);
+        if (el) el.textContent = "Sin conexión";
+      }
+    });
+  }
+  return { list, add, remove, render };
+})();
+
+/* =========================================================
+   PANEL "ENVIAR UN PAQUETE"
+   ========================================================= */
+const Send = (() => {
+  const form = $("#sendForm");
+  const cities = ["Goya", "Resistencia", "Otra localidad"];
+  const state = { origen: null, destino: null, size: null, slot: null, date: null };
+
+  // Chips de localidades (con sugerencias Goya / Resistencia / Otra)
+  $$("[data-city]", form).forEach(box => {
+    const key = box.dataset.city;
+    box.innerHTML = cities.map(c => `
+      <label class="opt"><input type="radio" name="${key}" value="${c}"><span class="face">${c}</span></label>`).join("");
+    box.addEventListener("change", e => {
+      state[key] = e.target.value;
+      const other = $(`#${key}Otra`);
+      other.hidden = e.target.value !== "Otra localidad";
+      if (!other.hidden) other.focus();
+      setErr(key === "origen" ? "errOrigen" : "errDestino", "");
+    });
+  });
+
+  // Tarjetas de tamaño
+  $("#sizeTiles").innerHTML = CONFIG.tamanos.map(t => `
+    <label class="opt"><input type="radio" name="size" value="${t.id}">
+      <span class="face">${icon(t.icono)}<strong>${t.nombre}</strong><small>${t.desc}</small></span></label>`).join("");
+  $("#sizeTiles").addEventListener("change", e => { state.size = e.target.value; setErr("errSize", ""); });
+
+  // Franjas
+  $("#sendSlots").innerHTML = CONFIG.franjas.map(f => `
+    <label class="opt"><input type="radio" name="sendSlot" value="${f}"><span class="face">${icon("i-clock")}${f}</span></label>`).join("");
+  $("#sendSlots").addEventListener("change", e => { state.slot = e.target.value; setErr("errSendSlot", ""); });
+
+  const cal = createCalendar($("#sendCal"), d => { state.date = d; setErr("errSendDate", ""); });
+
+  // Contrarreembolso
+  form.addEventListener("change", e => {
+    if (e.target.name === "cod") $("#codAmountField").hidden = e.target.value !== "si";
+  });
+
+  const cityValue = key => state[key] === "Otra localidad" ? ($(`#${key}Otra`).value.trim() || "") : state[key];
+
+  // Base que recibe el pedido según el ORIGEN
+  function baseDeOrigen() {
+    if (state.origen === "Goya") return CONFIG.bases.goya;
+    if (state.origen === "Resistencia") return CONFIG.bases.resistencia;
+    return CONFIG.bases[CONFIG.baseOtra];
+  }
+
+  function data() {
+    const cod = $('input[name="cod"]:checked', form).value === "si";
+    const monto = $("#codAmount").value.trim();
+    return {
+      origen: cityValue("origen"),
+      destino: cityValue("destino"),
+      tamano: CONFIG.tamanos.find(t => t.id === state.size)?.nombre || "",
+      fecha: state.date ? cap(fmtFecha(state.date)) : "",
+      franja: state.slot,
+      contrarreembolso: cod ? (monto ? `Sí, cobrar $ ${monto}` : "Sí") : "No",
+      nombre: $("#sendName").value.trim(),
+      telefono: $("#sendPhone").value.trim()
+    };
+  }
+
+  function validate(i) {
+    if (i === 0) {
+      let ok = true;
+      for (const [key, err, nombre] of [["origen", "errOrigen", "origen"], ["destino", "errDestino", "destino"]]) {
+        const other = $(`#${key}Otra`);
+        if (!state[key]) { setErr(err, `Elegí el ${nombre}.`); ok = false; }
+        else if (!cityValue(key)) { setErr(err, `Escribí la localidad de ${nombre}.`, other); ok = false; }
+        else setErr(err, "", other);
+      }
+      return ok;
+    }
+    if (i === 1) return state.size ? true : setErr("errSize", "Elegí un tamaño.");
+    if (i === 2) {
+      const a = state.date ? setErr("errSendDate", "") : setErr("errSendDate", "Elegí el día de retiro.");
+      const b = state.slot ? setErr("errSendSlot", "") : setErr("errSendSlot", "Elegí una franja horaria.");
+      return a && b;
+    }
+    if (i === 3) {
+      const a = $("#sendName").value.trim().length >= 2 ? setErr("errSendName", "", $("#sendName")) : setErr("errSendName", "Escribí tu nombre.", $("#sendName"));
+      const b = phoneOk($("#sendPhone").value) ? setErr("errSendPhone", "", $("#sendPhone")) : setErr("errSendPhone", "Escribí un teléfono válido.", $("#sendPhone"));
+      return a && b;
+    }
+    return true;
+  }
+
+  function onEnter(i) {
+    $("#sendSummaryWrap").hidden = false;
+    $("#sendDone").hidden = true;
+    $("#sendFoot").hidden = false;
+    $("#sendWa").hidden = i !== 4;
+    if (i !== 4) return;
+    const d = data(), b = baseDeOrigen();
+    $("#sendSummary").innerHTML = [
+      ["Origen", d.origen], ["Destino", d.destino], ["Tamaño", d.tamano],
+      ["Retiro", `${d.fecha}, ${d.franja}`], ["Contrarreembolso", d.contrarreembolso],
+      ["Nombre", d.nombre], ["Teléfono", d.telefono]
+    ].map(([k, v]) => `<div><dt>${k}</dt><dd>${esc(v)}</dd></div>`).join("");
+    $("#sendDestNote").textContent = `Tu pedido le llega a ${b.contacto} (base ${b.ciudad}, ${b.telefono}).`;
+  }
+
+  let lastCode = null, sending = false;
+  // conWhatsApp = false: "Confirmar pedido" (le llega solo al panel del chofer)
+  // conWhatsApp = true:  además abre WhatsApp con el mensaje armado
+  async function finish(conWhatsApp = false) {
+    if ($("#sendDone").hidden === false || sending) return; // ya confirmado
+    const d = data(), b = baseDeOrigen();
+    sending = true;
+    const btn = $("#sendNext"), wbtn = $("#sendWa");
+    btn.disabled = true; wbtn.disabled = true;
+    // Se crea el pedido REAL en la base y se guarda en "Mis pedidos" de este dispositivo
+    lastCode = await Api.crearPedido({
+      p_origen: d.origen, p_destino: d.destino, p_tamano: d.tamano,
+      p_retiro: `${d.fecha}, ${d.franja}`, p_contrarreembolso: d.contrarreembolso,
+      p_nombre: d.nombre, p_telefono: d.telefono
+    });
+    btn.disabled = false; wbtn.disabled = false; sending = false;
+    if (lastCode) {
+      MyOrders.add({ codigo: lastCode, origen: d.origen, destino: d.destino, tipo: "Paquete" });
+      $("#sendCodeLbl").textContent = "Tu código de pedido:";
+      $("#sendDoneNote").textContent = `Ya le llegó a ${b.contacto} (base ${b.ciudad}). Te avisamos cuando lo retiremos.`;
+    } else {
+      // Sin conexión con la base: pedido de PRUEBA para poder ver el seguimiento
+      lastCode = Tracker.newCode();
+      Tracker.register(lastCode, { origen: d.origen, destino: d.destino, receptor: d.nombre });
+      MyOrders.add({ codigo: lastCode, origen: d.origen, destino: d.destino, tipo: "Paquete", prueba: true });
+      $("#sendCodeLbl").textContent = "Tu código de pedido (modo prueba):";
+      $("#sendDoneNote").textContent = "Modo prueba: el seguimiento es simulado.";
+    }
+    $("#sendCode").hidden = false;
+    const msg = [
+      `Hola ${b.contacto}, quiero enviar un paquete:`,
+      ``,
+      ...(lastCode ? [`• Código de pedido: ${lastCode}`] : []),
+      `• Origen: ${d.origen}`,
+      `• Destino: ${d.destino}`,
+      `• Tamaño: ${d.tamano}`,
+      `• Retiro: ${d.fecha}, ${d.franja}`,
+      `• Contrarreembolso: ${d.contrarreembolso}`,
+      `• Nombre: ${d.nombre}`,
+      `• Teléfono: ${d.telefono}`,
+      ``,
+      `(Pedido hecho desde la web)`
+    ].join("\n");
+    $("#sendCode").textContent = lastCode;
+    $("#sendSummaryWrap").hidden = true;
+    $("#sendDone").hidden = false;
+    $("#sendFoot").innerHTML = `
+      <button class="btn btn-ghost" type="button" id="sendNew">Nuevo envío</button>
+      <div class="foot-right">
+        ${conWhatsApp && enMarco ? `<a class="btn btn-wa" href="${waLink(b.whatsapp, msg)}" target="_blank" rel="noopener">${icon("i-wa")} WhatsApp</a>` : ""}
+        <button class="btn btn-primary" type="button" id="goTrack">Ver seguimiento ${icon("i-arrow")}</button>
+      </div>`;
+    $("#goTrack").focus();
+    $("#goTrack").addEventListener("click", () => { openPanel("track"); Tracker.search(lastCode); });
+    $("#sendNew").addEventListener("click", reset);
+
+    // Solo si eligió WhatsApp: se abre en la misma pestaña (los celulares no lo bloquean).
+    // Dentro de un marco (vista previa / link de Claude) queda el botón de arriba.
+    if (conWhatsApp && !enMarco) window.location.href = waLink(b.whatsapp, msg);
+  }
+
+  const footHTML = $("#sendFoot").innerHTML;
+  let wizard;
+  function bindWizard() {
+    wizard = createWizard({
+      form, back: $("#sendBack"), next: $("#sendNext"),
+      label: $("#sendStepLabel"), name: $("#sendStepName"),
+      bar: $("#p-send .progress-bar"), validate, onEnter,
+      lastLabel: `Confirmar pedido ${icon("i-check")}`, onFinish: () => finish(false)
+    });
+    $("#sendWa").addEventListener("click", () => finish(true));
+  }
+  function reset() {
+    form.reset();
+    Object.keys(state).forEach(k => state[k] = null);
+    $("#origenOtra").hidden = $("#destinoOtra").hidden = true;
+    $("#codAmountField").hidden = true;
+    $$(".field-err", form).forEach(e => e.textContent = "");
+    cal.reset();
+    $("#sendFoot").innerHTML = footHTML;
+    $("#sendCode").hidden = false;
+    bindWizard();
+  }
+  bindWizard();
+})();
+
+/* =========================================================
+   PANEL "MUDANZA"
+   ========================================================= */
+(() => {
+  const form = $("#moveForm");
+  const state = { tipo: null, amb: 2, slot: null, date: null };
+  const tipos = [
+    { v: "Departamento", i: "i-home", d: "Con o sin escaleras" },
+    { v: "Casa", i: "i-home", d: "Todo el hogar" },
+    { v: "Oficina", i: "i-box-l", d: "Muebles y equipos" }
+  ];
+  $("#moveTypes").innerHTML = tipos.map(t => `
+    <label class="opt"><input type="radio" name="moveType" value="${t.v}">
+      <span class="face">${icon(t.i)}<strong>${t.v}</strong><small>${t.d}</small></span></label>`).join("");
+  $("#moveTypes").addEventListener("change", e => { state.tipo = e.target.value; setErr("errMoveType", ""); });
+
+  const out = $("#ambOut");
+  const paintAmb = () => out.textContent = state.amb >= 8 ? "8 o más" : state.amb;
+  $("#ambMinus").addEventListener("click", () => { state.amb = Math.max(1, state.amb - 1); paintAmb(); });
+  $("#ambPlus").addEventListener("click", () => { state.amb = Math.min(8, state.amb + 1); paintAmb(); });
+
+  $("#moveSlots").innerHTML = CONFIG.franjas.map(f => `
+    <label class="opt"><input type="radio" name="moveSlot" value="${f}"><span class="face">${icon("i-clock")}${f}</span></label>`).join("");
+  $("#moveSlots").addEventListener("change", e => { state.slot = e.target.value; setErr("errMoveSlot", ""); });
+  const cal = createCalendar($("#moveCal"), d => { state.date = d; setErr("errMoveDate", ""); });
+
+  const base = () => {
+    const v = $('input[name="moveBase"]:checked', form).value;
+    return CONFIG.bases[v === "otra" ? CONFIG.baseOtra : v];
+  };
+
+  function data() {
+    const extras = $$('input[name="extra"]:checked', form).map(x => x.value);
+    return {
+      tipo: state.tipo,
+      ambientes: state.amb >= 8 ? "8 o más" : String(state.amb),
+      origen: $("#moveFrom").value.trim(),
+      destino: $("#moveTo").value.trim(),
+      fecha: state.date ? cap(fmtFecha(state.date)) : "",
+      horario: state.slot,
+      extras: extras.length ? extras.join(", ") : "Ninguno",
+      detalle: $("#moveNotes").value.trim(),
+      nombre: $("#moveName").value.trim(),
+      telefono: $("#movePhone").value.trim()
+    };
+  }
+
+  function validate(i) {
+    if (i === 0) return state.tipo ? true : setErr("errMoveType", "Elegí el tipo de mudanza.");
+    if (i === 1) {
+      const a = $("#moveFrom").value.trim().length > 3 ? setErr("errMoveFrom", "", $("#moveFrom")) : setErr("errMoveFrom", "Escribí la dirección de origen.", $("#moveFrom"));
+      const b = $("#moveTo").value.trim().length > 3 ? setErr("errMoveTo", "", $("#moveTo")) : setErr("errMoveTo", "Escribí la dirección de destino.", $("#moveTo"));
+      return a && b;
+    }
+    if (i === 2) {
+      const a = state.date ? setErr("errMoveDate", "") : setErr("errMoveDate", "Elegí la fecha.");
+      const b = state.slot ? setErr("errMoveSlot", "") : setErr("errMoveSlot", "Elegí un horario.");
+      return a && b;
+    }
+    if (i === 3) {
+      const a = $("#moveName").value.trim().length >= 2 ? setErr("errMoveName", "", $("#moveName")) : setErr("errMoveName", "Escribí tu nombre.", $("#moveName"));
+      const b = phoneOk($("#movePhone").value) ? setErr("errMovePhone", "", $("#movePhone")) : setErr("errMovePhone", "Escribí un teléfono válido.", $("#movePhone"));
+      return a && b;
+    }
+    return true;
+  }
+
+  function onEnter(i) {
+    $("#moveWa").hidden = i !== 4;
+    if (i !== 4) return;
+    const d = data(), b = base();
+    const rows = [
+      ["Tipo", `${d.tipo}, ${d.ambientes} ambiente${d.ambientes === "1" ? "" : "s"}`],
+      ["Origen", d.origen], ["Destino", d.destino],
+      ["Fecha", `${d.fecha}, ${d.horario}`], ["Extras", d.extras]
+    ];
+    if (d.detalle) rows.push(["Qué llevar", d.detalle]);
+    rows.push(["Nombre", d.nombre], ["Teléfono", d.telefono]);
+    $("#moveSummary").innerHTML = rows.map(([k, v]) => `<div><dt>${k}</dt><dd>${esc(v)}</dd></div>`).join("");
+    $("#moveDestNote").textContent = `Tu pedido le llega a ${b.contacto} (base ${b.ciudad}, ${b.telefono}).`;
+  }
+
+  let moving = false;
+  async function finish(conWhatsApp = false) {
+    if (moving || !$("#moveDone").hidden) return;
+    moving = true; $("#moveNext").disabled = true; $("#moveWa").disabled = true;
+    const d = data(), b = base();
+    // La mudanza también queda registrada para poder seguirla
+    const codigo = await Api.crearPedido({
+      p_origen: d.origen.slice(0, 80), p_destino: d.destino.slice(0, 80),
+      p_tamano: `Mudanza ${d.tipo}`.slice(0, 40), p_retiro: `${d.fecha}, ${d.horario}`,
+      p_contrarreembolso: "No", p_nombre: d.nombre, p_telefono: d.telefono
+    });
+    moving = false; $("#moveNext").disabled = false; $("#moveWa").disabled = false;
+    let codigoFinal = codigo;
+    if (codigo) MyOrders.add({ codigo, origen: d.origen, destino: d.destino, tipo: "Mudanza" });
+    else {
+      codigoFinal = Tracker.newCode();
+      Tracker.register(codigoFinal, { origen: d.origen, destino: d.destino, receptor: d.nombre });
+      MyOrders.add({ codigo: codigoFinal, origen: d.origen, destino: d.destino, tipo: "Mudanza", prueba: true });
+    }
+    const lines = [
+      `Hola ${b.contacto}, quiero pedir presupuesto para una mudanza:`,
+      ``,
+      ...(codigo ? [`• Código de pedido: ${codigo}`] : []),
+      `• Tipo: ${d.tipo} (${d.ambientes} ambiente${d.ambientes === "1" ? "" : "s"})`,
+      `• Origen: ${d.origen}`,
+      `• Destino: ${d.destino}`,
+      `• Fecha: ${d.fecha}`,
+      `• Horario de inicio: ${d.horario}`,
+      `• Extras: ${d.extras}`
+    ];
+    if (d.detalle) lines.push(`• Qué hay que llevar: ${d.detalle}`);
+    lines.push(`• Nombre: ${d.nombre}`, `• Teléfono: ${d.telefono}`, ``, `(Pedido hecho desde la web)`);
+    const url = waLink(b.whatsapp, lines.join("\n"));
+    // Pantalla de confirmación
+    $("#moveSummaryWrap").hidden = true;
+    $("#moveDone").hidden = false;
+    $("#moveCode").textContent = codigoFinal;
+    $("#moveCodeLbl").textContent = codigo ? "Tu código de pedido:" : "Tu código de pedido (modo prueba):";
+    $("#moveDoneNote").textContent = codigo
+      ? `Ya le llegó a ${b.contacto} (base ${b.ciudad}). Te contacta para pasarte el presupuesto.`
+      : "Modo prueba: el seguimiento es simulado.";
+    $("#moveFoot").innerHTML = `
+      <span></span>
+      <div class="foot-right">
+        ${conWhatsApp && enMarco ? `<a class="btn btn-wa" href="${url}" target="_blank" rel="noopener">${icon("i-wa")} WhatsApp</a>` : ""}
+        <button class="btn btn-primary" type="button" id="moveGoTrack">Ver seguimiento ${icon("i-arrow")}</button>
+      </div>`;
+    $("#moveGoTrack").addEventListener("click", () => { openPanel("track"); Tracker.search(codigoFinal); });
+    if (conWhatsApp && !enMarco) window.location.href = url;
+  }
+
+  createWizard({
+    form, back: $("#moveBack"), next: $("#moveNext"),
+    label: $("#moveStepLabel"), name: $("#moveStepName"),
+    bar: $("#p-move .progress-bar"), validate, onEnter,
+    lastLabel: `Confirmar pedido ${icon("i-check")}`, onFinish: () => finish(false)
+  });
+  $("#moveWa").addEventListener("click", () => finish(true));
+})();
+
+/* =========================================================
+   SEGUIMIENTO (simulado en JavaScript, sin servidor)
+   ========================================================= */
+const Tracker = (() => {
+  // Sin pedidos de ejemplo: solo se muestran pedidos reales
+  const orders = {};
+  let order = null, code = null, idx = 0, timer = null, times = [], rafId = null;
+  let mode = "demo", pollTimer = null, lastSig = "";
+
+  const steps = o => [
+    { t: "Pedido recibido",         s: "Registramos tu pedido." },
+    { t: `Retirado en ${o.origen}`, s: "Tu paquete ya está con nosotros." },
+    { t: "En viaje",                s: `Va camino a ${o.destino}.` },
+    { t: "En tu ciudad",            s: `Llegó a ${o.destino} y sale a reparto.` },
+    { t: "Ya estamos cerca",        s: "Llegamos en aprox. 10 minutos." },
+    { t: "¡Estamos afuera!",        s: "Te esperamos en la puerta." },
+    { t: "Entregado",               s: "Entrega registrada con foto." }
+  ];
+
+  function newCode() {
+    let c;
+    do { c = "EL-" + Math.floor(1000 + Math.random() * 9000); } while (orders[c]);
+    return c;
+  }
+  // Los pedidos creados se guardan en la sesión del navegador, así el código
+  // sigue funcionando al volver desde WhatsApp (sin servidor).
+
+  // Pedidos de PRUEBA: se crean solo si la página no puede conectarse a la base
+  // (por ejemplo, vista desde un link de Claude). Se guardan en este navegador.
+  const DEMO_KEY = "elyon_pedidos_prueba";
+  try { Object.assign(orders, JSON.parse(localStorage.getItem(DEMO_KEY) || "{}")); } catch (_) {}
+  function register(c, o) {
+    orders[c] = o;
+    try { localStorage.setItem(DEMO_KEY, JSON.stringify(orders)); } catch (_) {}
+  }
+
+  // Mapa estilizado en SVG (no es un mapa real)
+  function mapSVG(o) {
+    return `
+    <div class="map">
+      <svg viewBox="0 0 400 220" role="img" aria-label="Mapa ilustrativo de la ruta ${esc(o.origen)} a ${esc(o.destino)}">
+        <defs><pattern id="g" width="20" height="20" patternUnits="userSpaceOnUse"><path d="M20 0H0V20" fill="none" stroke="rgba(255,255,255,.05)"/></pattern></defs>
+        <rect width="400" height="220" fill="url(#g)"/>
+        <path d="M250 -10 C 235 40, 270 80, 245 120 S 230 180, 260 230" fill="none" stroke="#2f6fc7" stroke-width="14" opacity=".45" stroke-linecap="round"/>
+        <text x="270" y="60" fill="#6f9fdc" font-size="10" font-family="Inter,sans-serif" opacity=".8">Río Paraná</text>
+        <path id="routePath" d="M70 180 C 130 175, 160 140, 190 120 S 260 70, 330 45" fill="none" stroke="rgba(255,255,255,.25)" stroke-width="4" stroke-dasharray="2 8" stroke-linecap="round"/>
+        <path id="routeDone" d="M70 180 C 130 175, 160 140, 190 120 S 260 70, 330 45" fill="none" stroke="#45b3ec" stroke-width="4" stroke-linecap="round"/>
+        <circle cx="70" cy="180" r="7" fill="#081a3a" stroke="#45b3ec" stroke-width="3"/>
+        <circle cx="330" cy="45" r="7" fill="#081a3a" stroke="#f2a33a" stroke-width="3"/>
+        <text x="70" y="206" text-anchor="middle" fill="#fff" font-size="13" font-weight="600" font-family="Inter,sans-serif">${esc(o.origen)}</text>
+        <text x="330" y="25" text-anchor="middle" fill="#fff" font-size="13" font-weight="600" font-family="Inter,sans-serif">${esc(o.destino)}</text>
+        <g id="truck"><circle r="13" fill="#f2a33a"/><circle r="13" fill="none" stroke="#f2a33a" stroke-opacity=".35" stroke-width="8"/>
+          <g transform="translate(-8 -8) scale(.67)" fill="none" stroke="#081a3a" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M2 7h11v9H2zM13 10h4l3 3v3h-7z"/><circle cx="6" cy="17.5" r="1.8"/><circle cx="17" cy="17.5" r="1.8"/></g></g>
+      </svg>
+    </div>`;
+  }
+
+  // Mueve el camioncito sobre la ruta entre dos porcentajes
+  function animateTruck(from, to, ms) {
+    cancelAnimationFrame(rafId);
+    const path = $("#routePath"), done = $("#routeDone"), truck = $("#truck");
+    if (!path) return;
+    const len = path.getTotalLength();
+    done.style.strokeDasharray = len;
+    const place = p => {
+      const pt = path.getPointAtLength(len * p);
+      truck.setAttribute("transform", `translate(${pt.x} ${pt.y})`);
+      done.style.strokeDashoffset = len * (1 - p);
+    };
+    if (reduceMotion || ms <= 0) { place(to); return; }
+    place(from); // posición inicial inmediata (evita que el camión aparezca en la esquina)
+    const t0 = performance.now();
+    const tick = now => {
+      const k = Math.min(1, (now - t0) / ms);
+      place(from + (to - from) * k);
+      if (k < 1) rafId = requestAnimationFrame(tick);
+    };
+    rafId = requestAnimationFrame(tick);
+  }
+
+  // Imagen de ejemplo: caja en la puerta (ilustración SVG liviana)
+  function proofSVG() {
+    return `
+      <svg viewBox="0 0 400 240" role="img" aria-label="Foto de entrega de ejemplo: una caja apoyada frente a la puerta de una casa">
+        <rect width="400" height="240" fill="#d9cdb8"/>
+        <rect x="0" y="0" width="400" height="185" fill="#e9e2d4"/>
+        <rect x="130" y="20" width="140" height="165" fill="#5a3b26"/>
+        <rect x="140" y="30" width="120" height="155" fill="#7a5235"/>
+        <rect x="152" y="44" width="96" height="58" rx="3" fill="#6a462d"/>
+        <rect x="152" y="112" width="96" height="58" rx="3" fill="#6a462d"/>
+        <circle cx="243" cy="112" r="5" fill="#e0b25a"/>
+        <rect x="110" y="182" width="180" height="8" fill="#b9ab92"/>
+        <rect x="0" y="190" width="400" height="50" fill="#c7b89c"/>
+        <rect x="150" y="160" width="62" height="2" fill="rgba(0,0,0,.08)"/>
+        <g>
+          <ellipse cx="200" cy="214" rx="62" ry="7" fill="rgba(0,0,0,.18)"/>
+          <path d="M145 160 L200 148 L255 160 L255 208 L200 220 L145 208 Z" fill="#c8915a"/>
+          <path d="M145 160 L200 172 L255 160 L200 148 Z" fill="#dba86f"/>
+          <path d="M200 172 L200 220" stroke="#a87542" stroke-width="2"/>
+          <path d="M172 154 L227 166" stroke="#e9d2a8" stroke-width="7"/>
+          <rect x="210" y="182" width="32" height="20" rx="2" fill="#fff" transform="skewY(-12)" opacity=".92"/>
+        </g>
+        <rect x="300" y="12" width="88" height="22" rx="11" fill="rgba(0,0,0,.45)"/>
+        <text x="344" y="27" text-anchor="middle" fill="#fff" font-size="11" font-family="Inter,sans-serif">Ejemplo</text>
+      </svg>`;
+  }
+
+  function render() {
+    const list = steps(order);
+    $("#timeline").innerHTML = list.map((s, k) => {
+      const cls = k < idx ? "done" : k === idx ? (idx === list.length - 1 ? "done" : "current") : "pending";
+      const t = times[k] ? `<span class="tl-time">${times[k]}</span>` : "";
+      return `<li class="tl ${cls}" ${k === idx ? 'aria-current="step"' : ""}>
+        <span class="dot">${icon("i-check")}</span>
+        <div><div class="tl-t">${esc(s.t)}${t}</div><div class="tl-s">${esc(s.s)}</div></div>
+      </li>`;
+    }).join("");
+
+    const stage = $("#stage");
+    if (idx === 2 || idx === 3) {
+      if (!$("#routePath")) stage.innerHTML = mapSVG(order);
+      if (mode === "real") { if (idx === 2) animateTruck(0, .5, 1500); else animateTruck(.5, .95, 1200); }
+      else if (idx === 2) animateTruck(0, .82, CONFIG.demo.intervaloMs);
+      else animateTruck(.82, 1, 900);
+    } else if (idx === 4) {
+      stage.innerHTML = `<div class="eta-box">${icon("i-clock")}<div><strong>Llegamos en aprox. 10 minutos</strong><span class="note">Tené el celular a mano.</span></div></div>`;
+    } else if (idx === 5) {
+      stage.innerHTML = `<div class="eta-box">${icon("i-pin")}<div><strong>¡Estamos afuera!</strong><span class="note">Te esperamos en la puerta de tu domicilio.</span></div></div>`;
+      showToast();
+    } else if (idx === 6) {
+      const foto = order.fotoUrl
+        ? `<img src="${esc(order.fotoUrl)}" alt="Foto de la entrega del pedido" style="width:100%;height:auto;display:block" loading="lazy">`
+        : proofSVG();
+      stage.innerHTML = `
+        <div class="proof">
+          <figure>${foto}
+            <figcaption><span>Recibió: <strong>${esc(order.receptor || "—")}</strong></span><span>${times[6] || ""}</span></figcaption>
+          </figure>
+        </div>`;
+      $("#oEtaLbl").textContent = "Estado";
+      $("#oEta").textContent = `Entregado ${times[6] || ""}`;
+    } else {
+      stage.innerHTML = "";
+    }
+  }
+
+  function advance() {
+    if (idx >= 6) { pause(); return; }
+    idx++;
+    times[idx] = fmtHora(new Date());
+    render();
+    if (idx >= 6) { pause(); MyOrders.remove(code); }
+  }
+  function play() {
+    pause();
+    if (mode === "real") { if (code) pollTimer = setInterval(poll, CONFIG.supabase.refrescoMs); return; }
+    if (order && idx < 6) timer = setInterval(advance, CONFIG.demo.intervaloMs);
+  }
+  function pause() { clearInterval(timer); timer = null; clearInterval(pollTimer); pollTimer = null; cancelAnimationFrame(rafId); }
+
+  /* ----- MODO REAL: lee el pedido de la base y se actualiza solo ----- */
+  function applyReal(p) {
+    const h = p.historial || {};
+    const sig = `${p.estado}|${p.foto_path || ""}|${p.receptor || ""}`;
+    if (sig === lastSig) return;                 // nada cambió: no se redibuja
+    const prev = lastSig ? Number(lastSig.split("|")[0]) : -1;
+    lastSig = sig;
+    order = {
+      origen: p.origen, destino: p.destino, receptor: p.receptor,
+      fotoUrl: p.foto_path ? Api.fotoUrl(p.foto_path) : null
+    };
+    idx = p.estado;
+    times = [0,1,2,3,4,5,6].map(k => h[k] ? fmtHora(new Date(h[k])) : "");
+    $("#oFrom").textContent = p.origen;
+    $("#oTo").textContent = p.destino;
+    if (idx < 6) { $("#oEtaLbl").textContent = "Última actualización"; $("#oEta").textContent = times[idx] || "--:--"; }
+    if (idx < 2 || idx > 3) $("#stage").innerHTML = "";
+    if (idx === 5 && prev === 5) { /* ya avisado */ }
+    render();
+    if (idx === 6) { pause(); MyOrders.remove(code); }
+  }
+  async function poll() {
+    try {
+      const { pedido } = await Api.consultar(code);
+      if (pedido) { applyReal(pedido); setErr("errTrack", ""); }
+    } catch (_) { /* sin conexión: se reintenta en el próximo ciclo */ }
+  }
+  function setMode(m) {
+    mode = m;
+    $("#trackTag").hidden = m === "real";
+    $("#trackReset").hidden = m === "real";
+    $("#trackNote").textContent = m === "real"
+      ? "Se actualiza sola cada pocos segundos."
+      : "Simulación: avanza sola cada pocos segundos.";
+  }
+
+  function start() {
+    setMode("demo");
+    $("#oEtaLbl").textContent = "Hora estimada";
+    idx = 0; times = [fmtHora(new Date())];
+    $("#stage").innerHTML = "";
+    hideToast();
+    const eta = new Date(Date.now() + 40 * 60000);
+    $("#oEta").textContent = fmtHora(eta);
+    render();
+    play();
+  }
+
+  function showList() {
+    $("#order").hidden = true;
+    $("#trackTag").hidden = true;
+    $("#myOrders").hidden = false;
+    $("#codeAlt").hidden = false;
+    setErr("errTrack", "");
+    MyOrders.render();
+  }
+  function showOrder() {
+    $("#myOrders").hidden = true;
+    $("#codeAlt").hidden = true;
+    $("#order").hidden = false;
+  }
+  $("#backToList").addEventListener("click", () => { pause(); code = null; showList(); });
+  $("#myOrders").addEventListener("click", e => {
+    const it = e.target.closest("[data-code]");
+    if (it) search(it.dataset.code);
+  });
+
+  async function search(c) {
+    const input = $("#trackCode");
+    c = (c || input.value).trim().toUpperCase();
+    input.value = c;
+    pause();
+    // 1) Pedidos de demostración (EL-2048 y los creados sin conexión)
+    if (orders[c]) {
+      setErr("errTrack", "", input);
+      code = c; order = orders[c];
+      $("#oCode").textContent = c;
+      $("#oFrom").textContent = order.origen;
+      $("#oTo").textContent = order.destino;
+      showOrder();
+      start();
+      return;
+    }
+    // 2) Pedidos reales: se consultan en la base
+    if (!/^EL-[A-Z0-9]{4}-[A-Z0-9]{4}$/.test(c)) {
+      setErr("errTrack", `Revisá el código: tiene la forma EL-XXXX-XXXX.`, input);
+      return;
+    }
+    setErr("errTrack", "Buscando…", input);
+    try {
+      const { pedido } = await Api.consultar(c);
+      if (!pedido) {
+        setErr("errTrack", `No encontramos el código ${c}. Revisá que esté bien escrito.`, input);
+        $("#order").hidden = true;
+        return;
+      }
+      setErr("errTrack", "", input);
+      code = c; lastSig = "";
+      hideToast();
+      $("#stage").innerHTML = "";
+      $("#oCode").textContent = c;
+      setMode("real");
+      showOrder();
+      applyReal(pedido);
+      play();
+    } catch (_) {
+      setErr("errTrack", "No pudimos conectarnos. Revisá tu conexión e intentá de nuevo.", input);
+    }
+  }
+
+  // Notificación
+  const toast = $("#toast");
+  let toastTimer;
+  function showToast() {
+    toast.setAttribute("aria-hidden", "false");
+    toast.classList.add("show");
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(hideToast, 6000);
+  }
+  function hideToast() { toast.classList.remove("show"); toast.setAttribute("aria-hidden", "true"); }
+  $("#toastClose").addEventListener("click", hideToast);
+
+  $("#trackForm").addEventListener("submit", e => { e.preventDefault(); search(); });
+  // Clic directo en "Buscar" y Enter: funcionan aunque una vista previa bloquee formularios
+  $("#trackBtn").addEventListener("click", e => { e.preventDefault(); search(); });
+  $("#trackCode").addEventListener("keydown", e => { if (e.key === "Enter") { e.preventDefault(); search(); } });
+  $("#trackReset").addEventListener("click", () => { if (order) start(); });
+
+  return {
+    newCode, register, search, pause,
+    // Al volver a abrir el panel, la demo sigue donde estaba
+    onOpen() {
+      // Al abrir, siempre se arranca en "Mis pedidos"
+      pause(); showList();
+    }
+  };
+})();
+
+/* =========================================================
+   INICIO
+   ========================================================= */
+renderBases();
+renderQuotes();
+
+// Aparición suave al hacer scroll
+(() => {
+  const els = $$(".reveal");
+  if (reduceMotion || !("IntersectionObserver" in window)) { els.forEach(el => el.classList.add("in")); return; }
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(en => { if (en.isIntersecting) { en.target.classList.add("in"); io.unobserve(en.target); } });
+  }, { threshold: .12, rootMargin: "0px 0px -40px 0px" });
+  els.forEach((el, k) => {
+    if (el.closest(".hero")) el.style.transitionDelay = `${Math.min(k, 6) * 70}ms`;
+    io.observe(el);
+  });
+})();
+</script>
+</body>
+</html>

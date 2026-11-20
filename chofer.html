@@ -1,0 +1,402 @@
+<!doctype html>
+<html lang="es-AR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>El Elyon · Panel del chofer</title>
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#081a3a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="El Elyon">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Plus+Jakarta+Sans:wght@700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#081a3a;--navy-2:#0e2b5e;--blue:#1559c4;--sky:#45b3ec;--gold:#f2a33a;
+  --wa:#0f7f43;--ink:#0f1b2d;--muted:#b9cae2;--line:rgba(255,255,255,.14);
+  --font-title:"Plus Jakarta Sans",system-ui,sans-serif;--font-text:"Inter",system-ui,sans-serif;
+}
+*,*::before,*::after{box-sizing:border-box}
+html,body{margin:0}
+/* Fondo: la misma foto del camión de la web, aclarada; el panel va en una tarjeta azul */
+body{
+  min-height:100vh;min-height:100dvh;color:#fff;font-family:var(--font-text);font-size:16px;line-height:1.45;
+  background-color:#eef3fb;
+  background-image:
+    linear-gradient(180deg,rgba(238,243,251,.55) 0%,rgba(238,243,251,.82) 55%,#eef3fb 100%),
+    url("https://images.unsplash.com/photo-1601584115197-04ecc0da31d7?auto=format&fit=crop&w=1600&q=70");
+  background-size:cover;background-position:center top;background-attachment:fixed;
+  -webkit-font-smoothing:antialiased;
+  padding:max(28px,env(safe-area-inset-top)) 16px max(28px,env(safe-area-inset-bottom));
+}
+.shell{
+  padding:20px;border-radius:28px;
+  background:radial-gradient(90% 40% at 0% 0%,rgba(69,179,236,.28),transparent 70%),linear-gradient(180deg,#0e2b5e,#081a3a);
+  border:1px solid rgba(255,255,255,.18);
+  box-shadow:0 30px 80px rgba(8,26,58,.35),inset 0 1px 0 rgba(255,255,255,.2);
+}
+/* Dentro de la tarjeta azul, los pedidos van planos (sin sombra ni vidrio) para no apilar tarjetas */
+.shell .glass{background:rgba(255,255,255,.05);box-shadow:none;-webkit-backdrop-filter:none;backdrop-filter:none;border-color:rgba(255,255,255,.12);border-radius:18px}
+@media (max-width:600px){
+  body{padding:max(10px,env(safe-area-inset-top)) 8px max(14px,env(safe-area-inset-bottom))}
+  .shell{padding:16px 14px;border-radius:24px}
+}
+h1,h2,h3{font-family:var(--font-title);margin:0;letter-spacing:-.01em}
+button,input{font:inherit;color:inherit}
+button{cursor:pointer}
+[hidden]{display:none!important}
+.wrap{max-width:560px;margin:0 auto;display:grid;gap:14px}
+.glass{
+  background:linear-gradient(180deg,rgba(255,255,255,.12),rgba(255,255,255,.05));
+  border:1px solid rgba(255,255,255,.2);border-radius:22px;
+  -webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.3),0 10px 30px rgba(0,0,0,.25);
+}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:52px;padding:.7em 1.1em;border-radius:16px;border:1px solid transparent;font-weight:600;text-decoration:none;transition:transform .15s,opacity .2s}
+.btn:active{transform:scale(.97)}
+.btn[disabled]{opacity:.45;cursor:not-allowed}
+.btn-main{background:var(--sky);color:var(--navy);font-size:1.05rem}
+.btn-gold{background:var(--gold);color:var(--navy);font-size:1.05rem}
+.btn-wa{background:var(--wa);color:#fff}
+.btn-ghost{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.22);color:#fff}
+.btn-sm{min-height:42px;font-size:.92rem;border-radius:12px}
+.full{width:100%}
+.input{width:100%;min-height:52px;padding:.7em .9em;border-radius:14px;border:1px solid rgba(255,255,255,.35);background:rgba(255,255,255,.95);color:var(--ink)}
+.input:focus{outline:none;box-shadow:0 0 0 3px rgba(69,179,236,.5)}
+label{font-weight:600;font-size:.92rem;display:grid;gap:6px}
+.muted{color:var(--muted);font-size:.9rem}
+.err{color:#ffb4a3;font-size:.92rem;min-height:1.2em}
+
+/* Encabezado */
+.top{display:flex;align-items:center;gap:10px}
+.mark{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;background:linear-gradient(160deg,var(--sky),var(--blue))}
+.mark svg{width:22px;height:22px}
+.top h1{font-size:1.15rem}
+.top small{display:block;color:var(--muted);font-family:var(--font-text);font-weight:500;font-size:.8rem}
+.top .btn{margin-left:auto}
+
+/* Login */
+.login{padding:22px;display:grid;gap:14px}
+
+/* Pestañas */
+.tabs{display:grid;grid-template-columns:1fr 1fr;gap:6px;padding:5px;border-radius:16px;background:rgba(255,255,255,.07);border:1px solid var(--line)}
+.tabs button{min-height:44px;border-radius:12px;border:0;background:transparent;color:var(--muted);font-weight:600}
+.tabs button[aria-selected="true"]{background:rgba(255,255,255,.16);color:#fff}
+
+/* Tarjeta de pedido */
+.ped{padding:16px;display:grid;gap:12px}
+.ped-top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.code{font-family:var(--font-title);font-weight:800;font-size:1.15rem;letter-spacing:.04em}
+.route{font-weight:600;margin-top:2px}
+.pill{font-size:.78rem;font-weight:600;padding:.3em .7em;border-radius:999px;background:rgba(69,179,236,.18);border:1px solid rgba(69,179,236,.5);color:#cfeaff;white-space:nowrap}
+.pill.p5{background:rgba(242,163,58,.2);border-color:rgba(242,163,58,.6);color:#ffe0b3}
+.pill.p6{background:rgba(31,191,107,.18);border-color:rgba(31,191,107,.55);color:#bff3d6}
+.dl{display:grid;gap:4px;font-size:.92rem}
+.dl span{color:var(--muted)}
+.steps{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.steps i{height:6px;border-radius:9px;background:rgba(255,255,255,.14)}
+.steps i.on{background:var(--sky)}
+.row{display:flex;gap:8px;flex-wrap:wrap}
+.row .btn{flex:1}
+.photo{width:100%;border-radius:14px;display:block;border:1px solid var(--line)}
+.empty{padding:30px 18px;text-align:center}
+.list-title{font-size:1.05rem;margin-top:4px}
+#list{width:100%;margin:0}
+.link-hist{justify-self:center;background:none;border:0;color:var(--muted);font-size:.9rem;text-decoration:underline;text-underline-offset:3px;padding:8px}
+
+/* Hoja inferior */
+.sheet-bg{position:fixed;inset:0;background:rgba(3,10,26,.6);z-index:50;display:grid;align-items:end}
+.sheet{margin:0 auto;width:min(560px,100%);padding:20px 18px max(20px,env(safe-area-inset-bottom));border-radius:24px 24px 0 0;display:grid;gap:14px;max-height:92dvh;overflow:auto;
+  background:linear-gradient(180deg,rgba(14,38,82,.97),rgba(8,26,58,.99));border:1px solid rgba(255,255,255,.18)}
+.sheet h2{font-size:1.25rem}
+.preview{width:100%;max-height:300px;object-fit:cover;border-radius:14px}
+.picker{position:relative;min-height:120px;border:2px dashed rgba(255,255,255,.35);border-radius:16px;display:grid;place-items:center;text-align:center;padding:14px}
+.picker input{position:absolute;inset:0;opacity:0;cursor:pointer}
+.bigcode{font-family:var(--font-title);font-size:1.8rem;font-weight:800;text-align:center;letter-spacing:.05em;padding:10px;border:1px dashed rgba(255,255,255,.4);border-radius:14px}
+
+.toast{position:fixed;left:50%;bottom:max(18px,env(safe-area-inset-bottom));transform:translateX(-50%);z-index:80;background:#fff;color:var(--ink);padding:12px 16px;border-radius:14px;font-weight:600;box-shadow:0 10px 30px rgba(0,0,0,.35);max-width:calc(100% - 28px)}
+</style>
+</head>
+<body>
+<div class="wrap shell">
+
+  <header class="top">
+    <span class="mark"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 7h11v9H2zM13 10h4l3 3v3h-7z"/><circle cx="6" cy="17.5" r="1.8"/><circle cx="17" cy="17.5" r="1.8"/></svg></span>
+    <div><h1>El Elyon</h1><small id="who">Panel del chofer</small></div>
+    <button class="btn btn-ghost btn-sm" id="logout" hidden>Salir</button>
+  </header>
+
+  <!-- LOGIN -->
+  <form class="glass login" id="loginForm" hidden>
+    <h2>Ingresar</h2>
+    <label>Email<input class="input" id="email" type="email" autocomplete="username" required></label>
+    <label>Contraseña<input class="input" id="pass" type="password" autocomplete="current-password" required></label>
+    <p class="err" id="loginErr" role="alert"></p>
+    <button class="btn btn-main" type="button" id="loginBtn">Entrar</button>
+  </form>
+
+  <!-- PANEL -->
+  <section id="app" hidden>
+    <div class="wrap" style="gap:12px">
+      <button class="btn btn-gold full" id="newBtn">+ Nuevo pedido</button>
+      <h2 class="list-title" id="listTitle">Pedidos activos</h2>
+      <div id="list" class="wrap" style="gap:12px" aria-live="polite"></div>
+      <button class="link-hist" type="button" id="histBtn">Ver historial de entregas</button>
+    </div>
+  </section>
+</div>
+
+<div id="sheetRoot"></div>
+<div class="toast" id="toast" role="status" hidden></div>
+
+<script>
+  // Si no carga la conexión (sin señal o CDN caído), avisar en vez de dejar la pantalla vacía
+  setTimeout(function () {
+    if (document.getElementById("loginForm").hidden && document.getElementById("app").hidden) {
+      document.querySelector(".wrap").insertAdjacentHTML("beforeend",
+        '<div class="glass empty"><p>No se pudo conectar. Revisá la señal y recargá la página.</p></div>');
+    }
+  }, 8000);
+</script>
+
+<script type="module">
+import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
+
+/* ===== CONFIGURACIÓN ===== */
+const SUPABASE_URL = "https://kynvsfupwtkngtxncfbf.supabase.co";
+// Clave pública (anon). Es seguro que esté acá: la base está protegida con RLS.
+// NUNCA pongas acá la clave "service_role".
+const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt5bnZzZnVwd3Rrbmd0eG5jZmJmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTUxMzI2OTcsImV4cCI6MjExMDcwODY5N30.sV1fiBsChiH6_cAs-EoMcAzwdwc0lGr3l2GAJlsz3Qc";
+const BUCKET = "entregas";
+
+const ESTADOS = ["Pedido recibido","Retirado","En viaje","En tu ciudad","Ya estamos cerca","¡Estamos afuera!","Entregado"];
+const BOTON = ["","Marcar retirado","Salió de viaje","Llegó a la ciudad","Ya estamos cerca","Estamos afuera","Entregar con foto"];
+
+const sb = createClient(SUPABASE_URL, SUPABASE_KEY);
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+let tab = "activos", pedidos = [], refreshTimer = null;
+
+function toast(msg){ const t=$("#toast"); t.textContent=msg; t.hidden=false; clearTimeout(t._t); t._t=setTimeout(()=>t.hidden=true,3000); }
+
+// Número argentino a formato wa.me (549 + área + número)
+function waNum(tel){
+  let d = String(tel||"").replace(/\D/g,"");
+  if (!d) return "";
+  if (d.startsWith("549")) return d;
+  if (d.startsWith("54")) return "549" + d.slice(2);
+  if (d.startsWith("0")) d = d.slice(1);
+  d = d.replace(/^(\d{2,4})15/, "$1"); // quita el 15 si lo escribieron
+  return "549" + d;
+}
+const waLink = (tel, msg) => `https://wa.me/${waNum(tel)}?text=${encodeURIComponent(msg)}`;
+
+/* ===== SESIÓN ===== */
+async function boot(){
+  const { data:{ session } } = await sb.auth.getSession();
+  if (!session) return showLogin();
+  const { data, error } = await sb.from("choferes").select("nombre").eq("user_id", session.user.id).maybeSingle();
+  if (error || !data){
+    await sb.auth.signOut();
+    showLogin("Tu usuario no está habilitado como chofer. Pedile al administrador que te agregue.");
+    return;
+  }
+  $("#who").textContent = `Hola, ${data.nombre}`;
+  $("#loginForm").hidden = true; $("#app").hidden = false; $("#logout").hidden = false;
+  load();
+  clearInterval(refreshTimer); refreshTimer = setInterval(load, 20000);
+}
+function showLogin(msg=""){
+  $("#app").hidden = true; $("#logout").hidden = true; $("#loginForm").hidden = false;
+  $("#loginErr").textContent = msg;
+}
+// El login se maneja con el clic del botón (no con el "submit" del formulario),
+// porque algunas vistas previas de archivos bloquean el envío de formularios.
+async function doLogin(){
+  const btn = $("#loginBtn");
+  if (btn.disabled) return;
+  const email = $("#email").value.trim(), pass = $("#pass").value;
+  if (!email || !pass) { $("#loginErr").textContent = "Completá el email y la contraseña."; return; }
+  btn.disabled = true; btn.textContent = "Entrando…"; $("#loginErr").textContent = "";
+  let error;
+  try { ({ error } = await sb.auth.signInWithPassword({ email, password: pass })); }
+  catch (e) { error = e; }
+  btn.disabled = false; btn.textContent = "Entrar";
+  if (error) {
+    const sinRed = error.name === "AuthRetryableFetchError" || /fetch|network|Failed/i.test(error.message || "");
+    $("#loginErr").textContent = sinRed
+      ? "No se pudo conectar con el servidor. Abrí esta página en Chrome o Safari (no en la vista previa) y revisá la conexión."
+      : "Email o contraseña incorrectos.";
+    return;
+  }
+  boot();
+}
+$("#loginBtn").addEventListener("click", e => { e.preventDefault(); doLogin(); });
+$("#loginForm").addEventListener("submit", e => { e.preventDefault(); doLogin(); });
+$("#pass").addEventListener("keydown", e => { if (e.key === "Enter") { e.preventDefault(); doLogin(); } });
+$("#logout").addEventListener("click", async () => { clearInterval(refreshTimer); await sb.auth.signOut(); showLogin(); });
+
+/* ===== LISTA ===== */
+async function load(){
+  let q = sb.from("pedidos").select("*").order("creado", { ascending: false }).limit(60);
+  q = tab === "activos" ? q.lt("estado", 6) : q.eq("estado", 6);
+  const { data, error } = await q;
+  if (error) { toast("No se pudo cargar. Revisá la conexión."); return; }
+  pedidos = data; render();
+}
+function fotoUrl(path){ return path ? sb.storage.from(BUCKET).getPublicUrl(path).data.publicUrl : ""; }
+
+function render(){
+  const list = $("#list");
+  if (!pedidos.length){
+    list.innerHTML = `<div class="glass empty"><p>${tab==="activos" ? "No hay pedidos activos." : "Todavía no hay entregas."}</p></div>`;
+    return;
+  }
+  list.innerHTML = pedidos.map(p => {
+    const steps = ESTADOS.map((_,k)=>`<i class="${k<=p.estado?"on":""}"></i>`).join("");
+    const next = p.estado < 6 ? BOTON[p.estado+1] : "";
+    const tel = p.cliente_telefono;
+    return `
+    <article class="glass ped" data-id="${p.id}">
+      <div class="ped-top">
+        <div><div class="code">${esc(p.codigo)}</div><div class="route">${esc(p.origen)} → ${esc(p.destino)}</div></div>
+        <span class="pill p${p.estado}">${esc(ESTADOS[p.estado])}</span>
+      </div>
+      <div class="steps" aria-hidden="true">${steps}</div>
+      <div class="dl">
+        ${p.cliente_nombre ? `<div><span>Cliente:</span> ${esc(p.cliente_nombre)}</div>` : ""}
+        ${p.tamano ? `<div><span>Tamaño:</span> ${esc(p.tamano)}</div>` : ""}
+        ${p.retiro ? `<div><span>Retiro:</span> ${esc(p.retiro)}</div>` : ""}
+        ${p.contrarreembolso && p.contrarreembolso !== "No" ? `<div><span>Contrarreembolso:</span> ${esc(p.contrarreembolso)}</div>` : ""}
+        ${p.estado===6 && p.receptor ? `<div><span>Recibió:</span> ${esc(p.receptor)}</div>` : ""}
+      </div>
+      ${p.estado===6 && p.foto_path ? `<img class="photo" src="${fotoUrl(p.foto_path)}" alt="Foto de entrega" loading="lazy">` : ""}
+      ${next ? `<button class="btn ${p.estado+1===6?"btn-gold":"btn-main"} full" data-act="next">${next}</button>` : ""}
+      <div class="row">
+        ${tel ? `<a class="btn btn-wa btn-sm" href="${waLink(tel, p.estado===5 ? `Hola ${p.cliente_nombre||""}, somos Transporte El Elyon: estamos afuera con tu pedido ${p.codigo}.` : `Hola ${p.cliente_nombre||""}, te escribimos de Transporte El Elyon por tu pedido ${p.codigo}.`)}">WhatsApp</a>
+                <a class="btn btn-ghost btn-sm" href="tel:+${waNum(tel)}">Llamar</a>` : ""}
+        ${p.estado>0 && p.estado<6 ? `<button class="btn btn-ghost btn-sm" data-act="undo">Deshacer</button>` : ""}
+      </div>
+    </article>`;
+  }).join("");
+}
+
+$("#list").addEventListener("click", async e => {
+  const b = e.target.closest("[data-act]"); if (!b) return;
+  const card = b.closest("[data-id]"); const p = pedidos.find(x => x.id === card.dataset.id);
+  if (b.dataset.act === "next"){
+    if (p.estado + 1 === 6) return openDeliver(p);
+    b.disabled = true;
+    await setEstado(p, p.estado + 1);
+    if (p.estado + 1 === 5 && p.cliente_telefono) toast("Avisale al cliente con el botón WhatsApp.");
+  }
+  if (b.dataset.act === "undo"){ b.disabled = true; await setEstado(p, p.estado - 1); }
+});
+
+async function setEstado(p, estado, extra = {}){
+  const { error } = await sb.from("pedidos").update({ estado, ...extra }).eq("id", p.id);
+  if (error) { toast("No se pudo guardar. Probá de nuevo."); load(); return false; }
+  if (navigator.vibrate) navigator.vibrate(30);
+  toast(`${p.codigo}: ${ESTADOS[estado]}`);
+  await load(); return true;
+}
+
+// Los entregados no aparecen en la lista principal; el historial queda aparte
+$("#histBtn").addEventListener("click", () => {
+  tab = tab === "activos" ? "entregados" : "activos";
+  $("#listTitle").textContent = tab === "activos" ? "Pedidos activos" : "Historial de entregas";
+  $("#histBtn").textContent = tab === "activos" ? "Ver historial de entregas" : "Volver a pedidos activos";
+  load();
+});
+
+/* ===== HOJAS (entregar / nuevo pedido) ===== */
+function sheet(html){
+  $("#sheetRoot").innerHTML = `<div class="sheet-bg" id="sheetBg"><div class="sheet" role="dialog" aria-modal="true">${html}</div></div>`;
+  $("#sheetBg").addEventListener("click", e => { if (e.target.id === "sheetBg" || e.target.closest("[data-cancel]")) closeSheet(); });
+}
+function closeSheet(){ $("#sheetRoot").innerHTML = ""; }
+
+// Achica la foto antes de subirla (ahorra datos del celular)
+function compress(file, max = 1280){
+  return new Promise((res, rej) => {
+    const img = new Image();
+    img.onload = () => {
+      const k = Math.min(1, max / Math.max(img.width, img.height));
+      const c = document.createElement("canvas");
+      c.width = Math.round(img.width * k); c.height = Math.round(img.height * k);
+      c.getContext("2d").drawImage(img, 0, 0, c.width, c.height);
+      c.toBlob(b => b ? res(b) : rej(new Error("foto")), "image/jpeg", .78);
+      URL.revokeObjectURL(img.src);
+    };
+    img.onerror = rej;
+    img.src = URL.createObjectURL(file);
+  });
+}
+
+function openDeliver(p){
+  sheet(`
+    <h2>Entregar ${esc(p.codigo)}</h2>
+    <p class="muted">Sacá una foto del paquete entregado. Se le muestra al cliente en la web.</p>
+    <div class="picker" id="picker"><input type="file" accept="image/*" capture="environment" id="photo"><span>📷 Tocá para sacar la foto</span></div>
+    <img class="preview" id="prev" hidden alt="Vista previa">
+    <label>¿Quién recibió?<input class="input" id="rec" placeholder="Nombre de quien recibe" maxlength="80"></label>
+    <p class="err" id="dErr" role="alert"></p>
+    <button class="btn btn-gold full" id="dOk">Confirmar entrega</button>
+    <button class="btn btn-ghost full" data-cancel>Cancelar</button>`);
+  let blob = null;
+  $("#photo").addEventListener("change", async e => {
+    const f = e.target.files[0]; if (!f) return;
+    try { blob = await compress(f); $("#prev").src = URL.createObjectURL(blob); $("#prev").hidden = false; $("#picker").hidden = true; }
+    catch { $("#dErr").textContent = "No se pudo leer la foto. Probá de nuevo."; }
+  });
+  $("#dOk").addEventListener("click", async () => {
+    const rec = $("#rec").value.trim();
+    if (!blob) return $("#dErr").textContent = "Falta la foto.";
+    if (rec.length < 2) return $("#dErr").textContent = "Escribí quién recibió.";
+    $("#dOk").disabled = true; $("#dOk").textContent = "Subiendo…";
+    const path = `${new Date().toISOString().slice(0,10)}/${crypto.randomUUID()}.jpg`;
+    const up = await sb.storage.from(BUCKET).upload(path, blob, { contentType: "image/jpeg" });
+    if (up.error){ $("#dErr").textContent = "No se pudo subir la foto. Revisá la señal."; $("#dOk").disabled = false; $("#dOk").textContent = "Confirmar entrega"; return; }
+    const ok = await setEstado(p, 6, { receptor: rec, foto_path: path });
+    if (ok) closeSheet();
+  });
+}
+
+$("#newBtn").addEventListener("click", () => {
+  sheet(`
+    <h2>Nuevo pedido</h2>
+    <label>Origen<input class="input" id="nO" value="Goya" maxlength="80"></label>
+    <label>Destino<input class="input" id="nD" value="Resistencia" maxlength="80"></label>
+    <label>Cliente<input class="input" id="nN" placeholder="Nombre" maxlength="80"></label>
+    <label>Teléfono del cliente<input class="input" id="nT" type="tel" inputmode="tel" placeholder="Ej: 3777 123456" maxlength="30"></label>
+    <label>Detalle (opcional)<input class="input" id="nZ" placeholder="Ej: caja mediana, retiro mañana a la tarde" maxlength="120"></label>
+    <p class="err" id="nErr" role="alert"></p>
+    <button class="btn btn-gold full" id="nOk">Crear pedido</button>
+    <button class="btn btn-ghost full" data-cancel>Cancelar</button>`);
+  $("#nOk").addEventListener("click", async () => {
+    const o = $("#nO").value.trim(), d = $("#nD").value.trim();
+    if (o.length < 2 || d.length < 2) return $("#nErr").textContent = "Completá origen y destino.";
+    $("#nOk").disabled = true;
+    const { data, error } = await sb.from("pedidos").insert({
+      origen: o, destino: d, cliente_nombre: $("#nN").value.trim() || null,
+      cliente_telefono: $("#nT").value.trim() || null, retiro: $("#nZ").value.trim() || null
+    }).select("codigo, cliente_telefono, cliente_nombre").single();
+    if (error){ $("#nErr").textContent = "No se pudo crear. Probá de nuevo."; $("#nOk").disabled = false; return; }
+    const msg = `Hola ${data.cliente_nombre||""}, tu pedido en Transporte El Elyon es ${data.codigo}. Podés seguirlo en nuestra web con ese código.`;
+    sheet(`
+      <h2>Pedido creado</h2>
+      <p class="muted">Pasale este código al cliente para que siga su envío:</p>
+      <div class="bigcode">${esc(data.codigo)}</div>
+      ${data.cliente_telefono ? `<a class="btn btn-wa full" href="${waLink(data.cliente_telefono, msg)}">Enviar código por WhatsApp</a>` : ""}
+      <button class="btn btn-ghost full" data-cancel>Listo</button>`);
+    tab = "activos"; $("#listTitle").textContent = "Pedidos activos"; $("#histBtn").textContent = "Ver historial de entregas"; load();
+  });
+});
+
+sb.auth.onAuthStateChange((ev) => { if (ev === "SIGNED_OUT") showLogin(); });
+boot();
+</script>
+</body>
+</html>
