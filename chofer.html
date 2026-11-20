@@ -135,6 +135,8 @@ label{font-weight:600;font-size:.92rem;display:grid;gap:6px}
 .picker input{position:absolute;inset:0;opacity:0;cursor:pointer}
 .bigcode{font-family:var(--font-title);font-size:1.8rem;font-weight:800;text-align:center;letter-spacing:.05em;padding:10px;border:1px dashed rgba(255,255,255,.4);border-radius:14px}
 
+.aviso-msg{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.18);border-radius:14px;padding:12px 14px;margin:4px 0 12px;line-height:1.45;font-size:.95rem;overflow-wrap:anywhere}
+body:has(.sheet-bg) .toast{bottom:auto;top:max(18px,env(safe-area-inset-top))}
 .toast{position:fixed;left:50%;bottom:max(18px,env(safe-area-inset-bottom));transform:translateX(-50%);z-index:80;background:#fff;color:var(--ink);padding:12px 16px;border-radius:14px;font-weight:600;box-shadow:0 10px 30px rgba(0,0,0,.35);max-width:calc(100% - 28px)}
 </style>
 </head>
@@ -372,8 +374,8 @@ $("#list").addEventListener("click", async e => {
   if (b.dataset.act === "next"){
     if (p.estado + 1 === 6) return openDeliver(p);
     b.disabled = true;
-    await setEstado(p, p.estado + 1);
-    if (p.estado + 1 === 5 && p.cliente_telefono) toast("Avisale al cliente con el botón WhatsApp.");
+    const nuevo = p.estado + 1;
+    if (await setEstado(p, nuevo)) avisarCliente(p, nuevo);
   }
   if (b.dataset.act === "undo"){ b.disabled = true; await setEstado(p, p.estado - 1); }
   if (b.dataset.act === "confirm"){
@@ -421,6 +423,38 @@ $("#histBtn").addEventListener("click", () => {
   $("#histBtn").textContent = tab === "activos" ? "Ver historial (entregados y cancelados)" : "Volver a pedidos activos";
   load();
 });
+
+
+/* ===== AVISO AL CLIENTE =====
+   Después de cada cambio de estado aparece abajo el mensaje ya escrito.
+   Un toque abre WhatsApp con el texto listo: solo queda apretar enviar. */
+const SEGUIR_URL = "https://thiago3846291-creator.github.io/paqueteriaelelyon/";
+function mensajeEstado(p, estado, receptor){
+  const nom = (p.cliente_nombre || "").split(" ")[0];
+  const hola = `Hola${nom ? " " + nom : ""}, te escribimos de Transporte El Elyon.`;
+  const link = `\nSeguilo acá: ${SEGUIR_URL}?pedido=${p.codigo}`;
+  switch (estado){
+    case 1: return `${hola} Ya retiramos tu pedido ${p.codigo}. Te vamos avisando cómo avanza.${link}`;
+    case 2: return `${hola} Tu pedido ${p.codigo} ya está en viaje a ${p.destino}.${link}`;
+    case 3: return `${hola} Tu pedido ${p.codigo} ya llegó a ${p.destino}. Pronto te lo llevamos.${link}`;
+    case 4: return `${hola} Ya estamos cerca con tu pedido ${p.codigo}, llegamos en unos minutos.`;
+    case 5: return `${hola} ¡Estamos afuera con tu pedido ${p.codigo}!`;
+    case 6: return `${hola} Tu pedido ${p.codigo} fue entregado${receptor ? ` a ${receptor}` : ""}. ¡Gracias por elegirnos!`;
+    default: return `${hola} Te escribimos por tu pedido ${p.codigo}.`;
+  }
+}
+function avisarCliente(p, estado, receptor){
+  const tel = p.cliente_telefono;
+  if (!tel) { if (estado === 6) closeSheet(); return; }
+  const msg = mensajeEstado(p, estado, receptor);
+  sheet(`
+    <h2>Avisale a ${esc(p.cliente_nombre || "el cliente")}</h2>
+    <p class="muted">${esc(p.codigo)} pasó a <b>${esc(ESTADOS[estado])}</b>. Este es el mensaje:</p>
+    <p class="aviso-msg">${esc(msg).replace(/\n/g, "<br>")}</p>
+    <a class="btn btn-wa full" id="avisoWa" href="${waLink(tel, msg)}" target="_blank" rel="noopener">Mandar por WhatsApp</a>
+    <button class="btn btn-ghost full" data-cancel>Ahora no</button>`);
+  $("#avisoWa").addEventListener("click", () => setTimeout(closeSheet, 300));
+}
 
 /* ===== HOJAS (entregar / nuevo pedido) ===== */
 function sheet(html){
@@ -476,7 +510,7 @@ function openDeliver(p){
     const up = await sb.storage.from(BUCKET).upload(path, blob, { contentType: "image/jpeg" });
     if (up.error){ $("#dErr").textContent = "No se pudo subir la foto. Revisá la señal."; $("#dOk").disabled = false; $("#dOk").textContent = "Confirmar entrega"; return; }
     const ok = await setEstado(p, 6, { receptor: rec, foto_path: path });
-    if (ok) closeSheet();
+    if (ok) avisarCliente(p, 6, rec);
   });
 }
 

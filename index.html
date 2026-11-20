@@ -2565,6 +2565,14 @@ renderBases();
 renderQuotes();
 if (CONFIG.preciosEjemplo) $("#quoteEj").textContent = "Precios de ejemplo para la demostración.";
 
+// Link del WhatsApp del chofer: ?pedido=EL-XXXX-XXXX abre el seguimiento de ese pedido
+(() => {
+  const c = new URLSearchParams(location.search).get("pedido");
+  if (!c || !/^EL-[A-Z0-9]{4}-[A-Z0-9]{4}$/i.test(c)) return;
+  const codigo = c.toUpperCase();
+  openPanel("track"); Tracker.search(codigo);
+})();
+
 // Instalar la web como app (ícono en la pantalla de inicio)
 (() => {
   const instalada = matchMedia("(display-mode: standalone)").matches || navigator.standalone === true;
