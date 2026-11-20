@@ -67,6 +67,12 @@
 
 *,*::before,*::after{box-sizing:border-box}
 html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+/* Lenis (scroll suave): reglas de lenis.css */
+html.lenis,html.lenis body{height:auto}
+html.lenis{scroll-behavior:auto}
+.lenis:not(.lenis-autoToggle).lenis-stopped{overflow:clip}
+.lenis [data-lenis-prevent]{overscroll-behavior:contain}
+.lenis.lenis-smooth iframe{pointer-events:none}
 body{margin:0;font-family:var(--font-text);color:var(--ink);background:var(--bg);line-height:1.55;font-size:16px;-webkit-font-smoothing:antialiased}
 img,svg{display:block;max-width:100%}
 h1,h2,h3,h4{font-family:var(--font-title);line-height:1.1;margin:0;letter-spacing:-.02em}
@@ -918,7 +924,7 @@ html.lite .overlay{background:rgba(3,10,26,.7)}
 <!-- =========================================================
      PANELES (un solo overlay; se muestra un panel por vez)
      ========================================================= -->
-<div class="overlay" id="overlay" aria-hidden="true">
+<div class="overlay" id="overlay" aria-hidden="true" data-lenis-prevent>
 
   <!-- 3) ENVIAR UN PAQUETE -->
   <section class="panel glass-dark" id="p-send" role="dialog" aria-modal="true" aria-labelledby="sendTitle" hidden>
@@ -1207,6 +1213,10 @@ html.lite .overlay{background:rgba(3,10,26,.7)}
   <button class="x" type="button" id="toastClose" aria-label="Cerrar notificación"><svg aria-hidden="true"><use href="#i-x"/></svg></button>
 </div>
 
+<!-- GSAP + Lenis, servidos desde el propio sitio (sin depender de un CDN) -->
+<script src="vendor/gsap.min.js"></script>
+<script src="vendor/ScrollTrigger.min.js"></script>
+<script src="vendor/lenis.min.js"></script>
 <script>
 /* =========================================================
    CONFIGURACIÓN: editá acá textos, teléfonos y precios
@@ -1307,6 +1317,17 @@ const CONFIG = {
 const $  = (s, c = document) => c.querySelector(s);
 const $$ = (s, c = document) => [...c.querySelectorAll(s)];
 const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+const hayGsap = !!(window.gsap && window.ScrollTrigger);
+if (hayGsap) gsap.registerPlugin(ScrollTrigger);
+/* Scroll suave con Lenis, sincronizado con el reloj de GSAP. Si falta alguna librería,
+   si la persona pidió "Reducir movimiento" o el equipo es liviano, queda el scroll normal. */
+const lenis = hayGsap && window.Lenis && !reduceMotion && !document.documentElement.classList.contains("lite")
+  ? new Lenis({ autoRaf: false }) : null;
+if (lenis) {
+  lenis.on("scroll", ScrollTrigger.update);
+  gsap.ticker.add(t => lenis.raf(t * 1000));
+  gsap.ticker.lagSmoothing(0);
+}
 const esc = s => String(s).replace(/[&<>"']/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[c]));
 const icon = id => `<svg aria-hidden="true"><use href="#${id}"/></svg>`;
 const waLink = (numero, mensaje) => `https://wa.me/${numero}?text=${encodeURIComponent(mensaje)}`;
@@ -1415,6 +1436,7 @@ function openPanel(name) {
   overlay.classList.add("open");
   overlay.setAttribute("aria-hidden", "false");
   document.body.classList.add("lock");
+  lenis && lenis.stop();
   closeMenu();
   // Foco en el primer elemento útil del panel
   requestAnimationFrame(() => {
@@ -1432,6 +1454,7 @@ function closePanel() {
   overlay.classList.remove("open");
   overlay.setAttribute("aria-hidden", "true");
   document.body.classList.remove("lock");
+  lenis && lenis.start();
   if (currentPanel === "track") Tracker.pause();
   const p = panel;
   setTimeout(() => { if (!overlay.classList.contains("open")) p.hidden = true; }, 300);
@@ -1468,6 +1491,7 @@ document.addEventListener("click", e => {
    Con "Reducir movimiento" activado igual se desliza, pero más rápido. */
 let scrollAnim = null;
 function deslizarA(destino) {
+  if (lenis) { lenis.scrollTo(destino, { duration: Math.min(1.1, Math.max(.6, Math.abs(destino - scrollY) * .0005)) }); return; }
   cancelAnimationFrame(scrollAnim);
   const inicio = window.scrollY, dist = destino - inicio;
   if (Math.abs(dist) < 2) return;
@@ -2606,7 +2630,7 @@ if (CONFIG.preciosEjemplo) $("#quoteEj").textContent = "Precios de ejemplo para 
     const r = ruta.getBoundingClientRect();
     const p = Math.min(1, Math.max(0, (clientY - r.top - CAM / 2) / (r.height - CAM)));
     const destino = p * (document.documentElement.scrollHeight - innerHeight);
-    if (suave) deslizarA(destino); else window.scrollTo(0, destino);
+    if (suave) deslizarA(destino); else if (lenis) lenis.scrollTo(destino, { immediate: true }); else window.scrollTo(0, destino);
   };
   ruta.addEventListener("pointerdown", e => {
     arrastrando = e.target.closest("#camion") !== null;
@@ -2655,6 +2679,23 @@ if (window.matchMedia("(hover: hover)").matches && !reduceMotion) {
 (() => {
   const els = $$(".reveal");
   if (reduceMotion || !("IntersectionObserver" in window)) { els.forEach(el => el.classList.add("in")); return; }
+  if (hayGsap) {
+    // Hero: entra escalonado al cargar. Resto: ScrollTrigger.batch escalona lo que entra junto (tarjetas en fila)
+    els.filter(el => el.closest(".hero")).forEach((el, k) => {
+      el.style.transitionDelay = `${Math.min(k, 6) * 70}ms`;
+      el.classList.add("in");
+    });
+    ScrollTrigger.batch(els.filter(el => !el.closest(".hero")), {
+      start: "top 92%", once: true,
+      onEnter: grupo => grupo.forEach((el, k) => {
+        el.style.transitionDelay = `${Math.min(k, 5) * 80}ms`;
+        el.classList.add("in");
+        // El retraso solo sirve para la entrada: después no debe frenar el hover
+        el.addEventListener("transitionend", () => { el.style.transitionDelay = ""; }, { once: true });
+      })
+    });
+    return;
+  }
   const io = new IntersectionObserver(entries => {
     entries.forEach(en => { if (en.isIntersecting) { en.target.classList.add("in"); io.unobserve(en.target); } });
   }, { threshold: .12, rootMargin: "0px 0px -40px 0px" });

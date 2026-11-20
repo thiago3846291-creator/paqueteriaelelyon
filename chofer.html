@@ -186,6 +186,7 @@ label{font-weight:600;font-size:.92rem;display:grid;gap:6px}
   }, 8000);
 </script>
 
+<script src="vendor/gsap.min.js"></script>
 <script type="module">
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
 
@@ -425,6 +426,11 @@ $("#histBtn").addEventListener("click", () => {
 function sheet(html){
   $("#sheetRoot").innerHTML = `<div class="sheet-bg" id="sheetBg"><div class="sheet" role="dialog" aria-modal="true">${html}</div></div>`;
   $("#sheetBg").addEventListener("click", e => { if (e.target.id === "sheetBg" || e.target.closest("[data-cancel]")) closeSheet(); });
+  // La hoja sube desde abajo (rápido: es una herramienta de trabajo)
+  if (window.gsap && !matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    gsap.from("#sheetBg", { opacity: 0, duration: .2 });
+    gsap.from("#sheetBg .sheet", { yPercent: 100, duration: .28, ease: "power3.out" });
+  }
 }
 function closeSheet(){ $("#sheetRoot").innerHTML = ""; }
 
