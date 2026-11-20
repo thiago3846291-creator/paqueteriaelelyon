@@ -1281,10 +1281,37 @@ document.addEventListener("click", e => {
     // Se apunta al contenido de la sección (no a su degradado de entrada)
     const anchor = target.id === "inicio" ? target : (target.querySelector(".wrap") || target);
     const top = anchor.getBoundingClientRect().top + window.scrollY - (target.id === "inicio" ? 0 : 104);
-    window.scrollTo({ top: Math.max(0, top), behavior: reduceMotion ? "auto" : "smooth" });
+    deslizarA(Math.max(0, top));
     try { history.replaceState(null, "", "#" + target.id); } catch (_) { /* algunas vistas previas no lo permiten */ }
   }
 });
+/* Desplazamiento suave hecho a mano: funciona igual en todos los navegadores y
+   celulares (algunos ignoran el "smooth" nativo o lo apagan con "Reducir movimiento").
+   Con "Reducir movimiento" activado igual se desliza, pero más rápido. */
+let scrollAnim = null;
+function deslizarA(destino) {
+  cancelAnimationFrame(scrollAnim);
+  const inicio = window.scrollY, dist = destino - inicio;
+  if (Math.abs(dist) < 2) return;
+  const dur = reduceMotion ? 300 : Math.min(1000, Math.max(500, Math.abs(dist) * 0.45));
+  const ease = t => t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+  const root = document.documentElement;
+  const prev = root.style.scrollBehavior;
+  root.style.scrollBehavior = "auto"; // evita que el CSS "smooth" pelee con la animación
+  const t0 = performance.now();
+  const paso = ahora => {
+    const k = Math.min(1, (ahora - t0) / dur);
+    window.scrollTo(0, inicio + dist * ease(k));
+    if (k < 1) scrollAnim = requestAnimationFrame(paso);
+    else root.style.scrollBehavior = prev;
+  };
+  scrollAnim = requestAnimationFrame(paso);
+  // Si la persona toca o usa la rueda, se corta la animación
+  const cortar = () => { cancelAnimationFrame(scrollAnim); root.style.scrollBehavior = prev; };
+  window.addEventListener("wheel", cortar, { once: true, passive: true });
+  window.addEventListener("touchstart", cortar, { once: true, passive: true });
+}
+
 // Clic fuera del panel lo cierra
 overlay.addEventListener("click", e => { if (e.target === overlay) closePanel(); });
 
