@@ -6,6 +6,14 @@
 <title>Transporte El Elyon · Paquetería, encomiendas y mudanzas</title>
 <meta name="description" content="Transporte El Elyon: paquetería dentro y fuera de la ciudad, reparto de encomiendas y mudanzas entre Goya y Resistencia. Tu carga, nuestro compromiso.">
 <meta name="theme-color" content="#081a3a">
+<!-- Instalable como app en el celular -->
+<link rel="manifest" href="app.webmanifest">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-180.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="El Elyon">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
 <!-- Tipografías: Plus Jakarta Sans (títulos) + Inter (textos) -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -527,6 +535,9 @@ textarea.input{min-height:96px;resize:vertical}
 .code-alt summary::after{content:" +";color:var(--sky)}
 .code-alt[open] summary::after{content:" −"}
 .code-alt .track-form{margin-top:12px}
+.install-tip{margin-top:16px;display:grid;gap:8px;padding:14px;border-radius:var(--radius-sm);background:rgba(69,179,236,.1);border:1px solid rgba(69,179,236,.35)}
+.install-tip .row{display:flex;gap:8px;flex-wrap:wrap}
+.install-tip .btn{min-height:40px;font-size:.9rem}
 .link-back{display:inline-flex;align-items:center;gap:6px;background:none;border:0;padding:0;color:#cfe6fb;font-weight:600;font-size:.9rem}
 .link-back svg{width:18px;height:18px}
 
@@ -1025,6 +1036,15 @@ html .choice:active,html .card:active,html .q-card:active,html .base:active,html
     <div class="panel-body">
       <!-- Mis pedidos: solo los hechos desde este dispositivo -->
       <div id="myOrders"></div>
+
+      <div class="install-tip" id="installTip" hidden>
+        <strong>Tené El Elyon como app</strong>
+        <p class="note" id="installTxt"></p>
+        <div class="row">
+          <button class="btn btn-primary" type="button" id="installBtn" hidden>Instalar</button>
+          <button class="btn btn-ghost" type="button" id="installNo">Ahora no</button>
+        </div>
+      </div>
 
       <details class="code-alt" id="codeAlt">
         <summary>¿Te pasaron un código por WhatsApp?</summary>
@@ -2296,6 +2316,33 @@ const Tracker = (() => {
 renderBases();
 renderQuotes();
 if (CONFIG.preciosEjemplo) $("#quoteEj").textContent = "Precios de ejemplo para la demostración.";
+
+// Instalar la web como app (ícono en la pantalla de inicio)
+(() => {
+  const instalada = matchMedia("(display-mode: standalone)").matches || navigator.standalone === true;
+  const esIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+  const esCel = /android|iphone|ipad|ipod/i.test(navigator.userAgent);
+  let promptInstalar = null;
+  const no = () => { try { return localStorage.getItem("elyon_no_instalar_web"); } catch (_) { return null; } };
+  function mostrar() {
+    if (instalada || no() || (!esCel && !promptInstalar) || enMarco) return;
+    $("#installTxt").textContent = esIOS
+      ? "Tocá Compartir (el cuadrado con la flecha) → \"Agregar a inicio\" y seguí tus pedidos con un toque."
+      : promptInstalar ? "Instalala y seguí tus pedidos con un toque." : "En Chrome: menú ⋮ → \"Instalar app\" o \"Agregar a pantalla principal\".";
+    $("#installTip").hidden = false;
+  }
+  window.addEventListener("beforeinstallprompt", e => { e.preventDefault(); promptInstalar = e; $("#installBtn").hidden = false; mostrar(); });
+  $("#installBtn").addEventListener("click", async () => {
+    if (!promptInstalar) return;
+    promptInstalar.prompt(); await promptInstalar.userChoice.catch(() => {});
+    promptInstalar = null; $("#installTip").hidden = true;
+  });
+  $("#installNo").addEventListener("click", () => {
+    $("#installTip").hidden = true;
+    try { localStorage.setItem("elyon_no_instalar_web", "1"); } catch (_) {}
+  });
+  mostrar();
+})();
 
 // Luz del "liquid glass" que sigue al puntero (solo con mouse)
 if (window.matchMedia("(hover: hover)").matches && !reduceMotion) {

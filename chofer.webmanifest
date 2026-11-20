@@ -1,16 +1,27 @@
 {
   "name": "El Elyon · Chofer",
-  "short_name": "El Elyon",
+  "short_name": "Chofer Elyon",
   "description": "Panel del chofer de Transporte El Elyon",
   "start_url": "chofer.html",
-  "scope": "./",
+  "scope": "./chofer.html",
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#081a3a",
   "theme_color": "#081a3a",
   "lang": "es-AR",
   "icons": [
-    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
-    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
-  ]
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "id": "chofer"
 }
