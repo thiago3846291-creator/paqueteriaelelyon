@@ -97,6 +97,12 @@ label{font-weight:600;font-size:.92rem;display:grid;gap:6px}
 .route{font-weight:600;margin-top:2px}
 .pill{font-size:.78rem;font-weight:600;padding:.3em .7em;border-radius:999px;background:rgba(69,179,236,.18);border:1px solid rgba(69,179,236,.5);color:#cfeaff;white-space:nowrap}
 .pill.p5{background:rgba(242,163,58,.2);border-color:rgba(242,163,58,.6);color:#ffe0b3}
+.pill.pc{background:rgba(255,120,100,.18);border-color:rgba(255,120,100,.55);color:#ffd2c9}
+.ped-pend{border-color:rgba(242,163,58,.55)!important}
+.alerta{font-size:.9rem;padding:10px 12px;border-radius:12px;background:rgba(255,120,100,.14);border:1px solid rgba(255,120,100,.5);color:#ffe1da}
+.paso{display:grid;gap:8px;padding:12px;border-radius:14px;background:rgba(242,163,58,.08);border:1px dashed rgba(242,163,58,.5)}
+.paso strong{font-size:.9rem}
+.recordar{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;padding:10px 12px;border-radius:12px;background:rgba(69,179,236,.1);border:1px solid rgba(69,179,236,.35);font-size:.92rem}
 .pill.p6{background:rgba(31,191,107,.18);border-color:rgba(31,191,107,.55);color:#bff3d6}
 .dl{display:grid;gap:4px;font-size:.92rem}
 .dl span{color:var(--muted)}
@@ -156,7 +162,7 @@ label{font-weight:600;font-size:.92rem;display:grid;gap:6px}
       <button class="btn btn-gold full" id="newBtn">+ Nuevo pedido</button>
       <h2 class="list-title" id="listTitle">Pedidos activos</h2>
       <div id="list" class="wrap" style="gap:12px" aria-live="polite"></div>
-      <button class="link-hist" type="button" id="histBtn">Ver historial de entregas</button>
+      <button class="link-hist" type="button" id="histBtn">Ver historial (entregados y cancelados)</button>
     </div>
   </section>
 </div>
@@ -252,34 +258,67 @@ $("#pass").addEventListener("keydown", e => { if (e.key === "Enter") { e.prevent
 $("#logout").addEventListener("click", async () => { clearInterval(refreshTimer); await sb.auth.signOut(); showLogin(); });
 
 /* ===== LISTA ===== */
+let faltas = {};   // teléfono normalizado -> cantidad de veces que no estuvo
 async function load(){
-  let q = sb.from("pedidos").select("*").order("creado", { ascending: false }).limit(60);
-  q = tab === "activos" ? q.lt("estado", 6) : q.eq("estado", 6);
-  const { data, error } = await q;
+  let q = sb.from("pedidos").select("*").order("creado", { ascending: false }).limit(80);
+  q = tab === "activos" ? q.lt("estado", 6).eq("cancelado", false) : q.or("estado.eq.6,cancelado.eq.true");
+  const [{ data, error }, f] = await Promise.all([
+    q,
+    sb.from("pedidos").select("tel_norm").eq("motivo_cancelacion", "no_estaba").limit(500)
+  ]);
   if (error) { toast("No se pudo cargar. Revisá la conexión."); return; }
-  pedidos = data; render();
+  faltas = {};
+  (f.data || []).forEach(r => { if (r.tel_norm) faltas[r.tel_norm] = (faltas[r.tel_norm] || 0) + 1; });
+  // Primero los que hay que confirmar, después por fecha de retiro
+  pedidos = data.sort((a, b) =>
+    (a.confirmado - b.confirmado) ||
+    String(a.retiro_fecha || "9999").localeCompare(String(b.retiro_fecha || "9999")) ||
+    String(b.creado).localeCompare(String(a.creado)));
+  render();
 }
 function fotoUrl(path){ return path ? sb.storage.from(BUCKET).getPublicUrl(path).data.publicUrl : ""; }
+
+// "hoy" / "mañana" según la fecha de retiro
+function cuando(fecha){
+  if (!fecha) return null;
+  const hoy = new Date(); hoy.setHours(0,0,0,0);
+  const d = new Date(fecha + "T00:00:00");
+  const dif = Math.round((d - hoy) / 864e5);
+  return dif === 0 ? "hoy" : dif === 1 ? "mañana" : dif < 0 ? "atrasado" : null;
+}
 
 function render(){
   const list = $("#list");
   if (!pedidos.length){
-    list.innerHTML = `<div class="glass empty"><p>${tab==="activos" ? "No hay pedidos activos." : "Todavía no hay entregas."}</p></div>`;
+    list.innerHTML = `<div class="glass empty"><p>${tab==="activos" ? "No hay pedidos activos." : "Todavía no hay entregas ni cancelaciones."}</p></div>`;
     return;
   }
   list.innerHTML = pedidos.map(p => {
+    const porConfirmar = !p.confirmado && p.estado === 0 && !p.cancelado;
     const steps = ESTADOS.map((_,k)=>`<i class="${k<=p.estado?"on":""}"></i>`).join("");
-    const next = p.estado < 6 ? BOTON[p.estado+1] : "";
-    const tel = p.cliente_telefono;
+    const next = !porConfirmar && !p.cancelado && p.estado < 6 ? BOTON[p.estado+1] : "";
+    const tel = p.cliente_telefono, nom = p.cliente_nombre || "";
+    const nf = p.tel_norm ? (faltas[p.tel_norm] || 0) : 0;
+    const dia = p.estado === 0 && !p.cancelado ? cuando(p.retiro_fecha) : null;
+    const pill = p.cancelado
+      ? `<span class="pill pc">${p.motivo_cancelacion === "no_estaba" ? "No estaba" : "Cancelado"}</span>`
+      : porConfirmar ? `<span class="pill p5">Por confirmar</span>`
+      : `<span class="pill p${p.estado}">${esc(ESTADOS[p.estado])}</span>`;
+    const msgConfirmar = `Hola ${nom}, te escribimos de Transporte El Elyon. Recibimos tu pedido ${p.codigo}${p.retiro ? ` (retiro: ${p.retiro})` : ""}. ¿Lo confirmás? Respondé SÍ y lo agendamos.`;
+    const msgRecordar = `Hola ${nom}, te recordamos que ${dia === "hoy" ? "hoy" : "mañana"} pasamos a retirar tu pedido ${p.codigo}${p.retiro ? ` (${p.retiro})` : ""}. ¿Seguimos? Respondé SÍ. Si no podés, avisanos así reprogramamos.`;
+    const msgGeneral = p.estado===5
+      ? `Hola ${nom}, somos Transporte El Elyon: estamos afuera con tu pedido ${p.codigo}.`
+      : `Hola ${nom}, te escribimos de Transporte El Elyon por tu pedido ${p.codigo}.`;
     return `
-    <article class="glass ped" data-id="${p.id}">
+    <article class="glass ped${porConfirmar ? " ped-pend" : ""}" data-id="${p.id}">
       <div class="ped-top">
         <div><div class="code">${esc(p.codigo)}</div><div class="route">${esc(p.origen)} → ${esc(p.destino)}</div></div>
-        <span class="pill p${p.estado}">${esc(ESTADOS[p.estado])}</span>
+        ${pill}
       </div>
-      <div class="steps" aria-hidden="true">${steps}</div>
+      ${nf ? `<div class="alerta">⚠ Este cliente <b>no estuvo ${nf} ${nf === 1 ? "vez" : "veces"}</b>. Pedile que pague por adelantado antes de ir.</div>` : ""}
+      ${!porConfirmar && !p.cancelado ? `<div class="steps" aria-hidden="true">${steps}</div>` : ""}
       <div class="dl">
-        ${p.cliente_nombre ? `<div><span>Cliente:</span> ${esc(p.cliente_nombre)}</div>` : ""}
+        ${nom ? `<div><span>Cliente:</span> ${esc(nom)}</div>` : ""}
         ${p.tamano ? `<div><span>Bultos:</span> ${esc(p.tamano)}</div>` : ""}
         ${p.pago ? `<div><span>Pago del envío:</span> ${esc(p.pago)}</div>` : ""}
         ${p.retiro ? `<div><span>Retiro:</span> ${esc(p.retiro)}</div>` : ""}
@@ -287,11 +326,27 @@ function render(){
         ${p.estado===6 && p.receptor ? `<div><span>Recibió:</span> ${esc(p.receptor)}</div>` : ""}
       </div>
       ${p.estado===6 && p.foto_path ? `<img class="photo" src="${fotoUrl(p.foto_path)}" alt="Foto de entrega" loading="lazy">` : ""}
+
+      ${porConfirmar ? `
+        <div class="paso">
+          <strong>1. Escribile al cliente para confirmar</strong>
+          ${tel ? `<a class="btn btn-wa full" href="${waLink(tel, msgConfirmar)}">Pedir confirmación por WhatsApp</a>` : `<span class="muted">Sin teléfono cargado.</span>`}
+          <strong>2. Cuando responda que sí</strong>
+          <button class="btn btn-main full" data-act="confirm">Marcar como confirmado</button>
+        </div>` : ""}
+
+      ${dia && p.confirmado ? `
+        <div class="recordar">
+          <span>Retiro <b>${dia}</b>${p.recordatorio_at ? " · <b>recordatorio enviado</b>" : ""}</span>
+          ${tel && !p.recordatorio_at ? `<a class="btn btn-gold btn-sm" data-act="remind" href="${waLink(tel, msgRecordar)}">Enviar recordatorio</a>` : ""}
+        </div>` : ""}
+
       ${next ? `<button class="btn ${p.estado+1===6?"btn-gold":"btn-main"} full" data-act="next">${next}</button>` : ""}
       <div class="row">
-        ${tel ? `<a class="btn btn-wa btn-sm" href="${waLink(tel, p.estado===5 ? `Hola ${p.cliente_nombre||""}, somos Transporte El Elyon: estamos afuera con tu pedido ${p.codigo}.` : `Hola ${p.cliente_nombre||""}, te escribimos de Transporte El Elyon por tu pedido ${p.codigo}.`)}">WhatsApp</a>
-                <a class="btn btn-ghost btn-sm" href="tel:+${waNum(tel)}">Llamar</a>` : ""}
-        ${p.estado>0 && p.estado<6 ? `<button class="btn btn-ghost btn-sm" data-act="undo">Deshacer</button>` : ""}
+        ${tel && !porConfirmar ? `<a class="btn btn-wa btn-sm" href="${waLink(tel, msgGeneral)}">WhatsApp</a>` : ""}
+        ${tel ? `<a class="btn btn-ghost btn-sm" href="tel:+${waNum(tel)}">Llamar</a>` : ""}
+        ${p.estado>0 && p.estado<6 && !p.cancelado ? `<button class="btn btn-ghost btn-sm" data-act="undo">Deshacer</button>` : ""}
+        ${p.estado<6 && !p.cancelado ? `<button class="btn btn-ghost btn-sm" data-act="cancel">Cancelar</button>` : ""}
       </div>
     </article>`;
   }).join("");
@@ -307,7 +362,35 @@ $("#list").addEventListener("click", async e => {
     if (p.estado + 1 === 5 && p.cliente_telefono) toast("Avisale al cliente con el botón WhatsApp.");
   }
   if (b.dataset.act === "undo"){ b.disabled = true; await setEstado(p, p.estado - 1); }
+  if (b.dataset.act === "confirm"){
+    b.disabled = true;
+    const { error } = await sb.from("pedidos").update({ confirmado: true }).eq("id", p.id);
+    if (error) { toast("No se pudo guardar. Probá de nuevo."); b.disabled = false; return; }
+    toast(`${p.codigo}: confirmado`); load();
+  }
+  if (b.dataset.act === "remind"){
+    // Se abre WhatsApp (el enlace sigue) y se marca que ya se recordó
+    sb.from("pedidos").update({ recordatorio_at: new Date().toISOString() }).eq("id", p.id).then(() => load());
+  }
+  if (b.dataset.act === "cancel") openCancel(p);
 });
+
+function openCancel(p){
+  sheet(`
+    <h2>Cancelar ${esc(p.codigo)}</h2>
+    <p class="muted">¿Qué pasó? Si el cliente no estuvo, queda anotado y la próxima vez el panel te avisa.</p>
+    <button class="btn btn-ghost full" data-motivo="cliente_cancelo">El cliente avisó que cancela</button>
+    <button class="btn btn-ghost full" data-motivo="no_estaba">Fuimos y no estaba / no respondió</button>
+    <button class="btn btn-ghost full" data-motivo="otro">Otro motivo</button>
+    <button class="btn btn-main full" data-cancel>Volver</button>`);
+  $("#sheetBg").addEventListener("click", async e => {
+    const m = e.target.closest("[data-motivo]"); if (!m) return;
+    m.disabled = true;
+    const { error } = await sb.from("pedidos").update({ cancelado: true, motivo_cancelacion: m.dataset.motivo }).eq("id", p.id);
+    if (error) { toast("No se pudo guardar. Probá de nuevo."); m.disabled = false; return; }
+    closeSheet(); toast(`${p.codigo}: cancelado`); load();
+  });
+}
 
 async function setEstado(p, estado, extra = {}){
   const { error } = await sb.from("pedidos").update({ estado, ...extra }).eq("id", p.id);
@@ -320,8 +403,8 @@ async function setEstado(p, estado, extra = {}){
 // Los entregados no aparecen en la lista principal; el historial queda aparte
 $("#histBtn").addEventListener("click", () => {
   tab = tab === "activos" ? "entregados" : "activos";
-  $("#listTitle").textContent = tab === "activos" ? "Pedidos activos" : "Historial de entregas";
-  $("#histBtn").textContent = tab === "activos" ? "Ver historial de entregas" : "Volver a pedidos activos";
+  $("#listTitle").textContent = tab === "activos" ? "Pedidos activos" : "Historial";
+  $("#histBtn").textContent = tab === "activos" ? "Ver historial (entregados y cancelados)" : "Volver a pedidos activos";
   load();
 });
 
@@ -405,7 +488,7 @@ $("#newBtn").addEventListener("click", () => {
       <div class="bigcode">${esc(data.codigo)}</div>
       ${data.cliente_telefono ? `<a class="btn btn-wa full" href="${waLink(data.cliente_telefono, msg)}">Enviar código por WhatsApp</a>` : ""}
       <button class="btn btn-ghost full" data-cancel>Listo</button>`);
-    tab = "activos"; $("#listTitle").textContent = "Pedidos activos"; $("#histBtn").textContent = "Ver historial de entregas"; load();
+    tab = "activos"; $("#listTitle").textContent = "Pedidos activos"; $("#histBtn").textContent = "Ver historial (entregados y cancelados)"; load();
   });
 });
 

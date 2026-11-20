@@ -535,6 +535,14 @@ textarea.input{min-height:96px;resize:vertical}
 .code-alt summary::after{content:" +";color:var(--sky)}
 .code-alt[open] summary::after{content:" −"}
 .code-alt .track-form{margin-top:12px}
+.policy{margin-top:14px;padding:12px 14px;border-radius:var(--radius-sm);background:rgba(242,163,58,.08);border:1px solid rgba(242,163,58,.35);font-size:.88rem;color:#e3ecf8;display:grid;gap:6px}
+.policy strong{display:flex;align-items:center;gap:8px;color:#fff;font-size:.92rem}
+.policy ul{margin:0;padding-left:18px;display:grid;gap:4px}
+.accept{display:flex;gap:10px;align-items:flex-start;margin-top:12px;font-size:.92rem;cursor:pointer}
+.accept input{width:20px;height:20px;margin-top:1px;accent-color:var(--sky);flex:none}
+.hp{position:absolute!important;left:-9999px!important;width:1px;height:1px;opacity:0}
+.pending-note{margin:12px 0 0;padding:10px 12px;border-radius:12px;font-size:.9rem;background:rgba(242,163,58,.12);border:1px solid rgba(242,163,58,.4);color:#ffe0b3}
+.pending-note.cancel{background:rgba(255,120,100,.12);border-color:rgba(255,120,100,.45);color:#ffd2c9}
 .install-tip{margin-top:16px;display:grid;gap:8px;padding:14px;border-radius:var(--radius-sm);background:rgba(69,179,236,.1);border:1px solid rgba(69,179,236,.35)}
 .install-tip .row{display:flex;gap:8px;flex-wrap:wrap}
 .install-tip .btn{min-height:40px;font-size:.9rem}
@@ -921,6 +929,10 @@ html .choice:active,html .card:active,html .q-card:active,html .base:active,html
           <h3 style="margin-bottom:14px">Revisá tu pedido</h3>
           <dl class="summary" id="sendSummary"></dl>
           <p class="note" style="margin-top:12px" id="sendDestNote"></p>
+          <div class="policy" id="sendPolicy"></div>
+          <label class="accept"><input type="checkbox" id="sendAcepto"> <span>Leí y acepto la política de reservas.</span></label>
+          <p class="field-err" id="errSendFinal" role="alert"></p>
+          <input type="text" class="hp" id="sendHp" name="empresa" tabindex="-1" autocomplete="off" aria-hidden="true">
         </div>
         <div class="success" id="sendDone" hidden>
           <span class="success-ico"><svg aria-hidden="true"><use href="#i-check"/></svg></span>
@@ -1006,6 +1018,10 @@ html .choice:active,html .card:active,html .q-card:active,html .base:active,html
         <div id="moveSummaryWrap">
           <dl class="summary" id="moveSummary"></dl>
           <p class="note" style="margin-top:12px" id="moveDestNote"></p>
+          <div class="policy" id="movePolicy"></div>
+          <label class="accept"><input type="checkbox" id="moveAcepto"> <span>Leí y acepto la política de reservas.</span></label>
+          <p class="field-err" id="errMoveFinal" role="alert"></p>
+          <input type="text" class="hp" id="moveHp" name="empresa" tabindex="-1" autocomplete="off" aria-hidden="true">
         </div>
         <div class="success" id="moveDone" hidden>
           <span class="success-ico"><svg aria-hidden="true"><use href="#i-check"/></svg></span>
@@ -1066,6 +1082,7 @@ html .choice:active,html .card:active,html .q-card:active,html .base:active,html
           </div>
           <div class="eta"><small id="oEtaLbl">Hora estimada</small><strong id="oEta">--:--</strong></div>
         </div>
+        <p class="pending-note" id="oPending" hidden></p>
 
         <ol class="timeline" id="timeline" aria-live="polite"></ol>
         <div class="stage" id="stage"></div>
@@ -1170,6 +1187,14 @@ const CONFIG = {
   /* PRECIOS por bulto, en pesos (número). null = "a cotizar".
      ⚠ Son PRECIOS DE EJEMPLO para la demo: reemplazalos por los reales del cliente
      y poné preciosEjemplo: false para sacar la aclaración. */
+  /* POLÍTICA DE RESERVAS (protege al negocio de pedidos que después no se concretan).
+     ⚠ Son valores DE EJEMPLO: acordalos con el cliente y poné ejemplo: false. */
+  politica: {
+    ejemplo: true,
+    cancelacionHoras: 12,   // cancelación sin costo hasta X horas antes del retiro
+    senaMudanzaPct: 20      // seña para reservar la fecha de una mudanza
+  },
+
   preciosEjemplo: true,
   precios: {
     sobre:    3500,
@@ -1213,6 +1238,7 @@ const enMarco = (() => { try { return window.self !== window.top; } catch (_) { 
 const fmtFecha = d => d.toLocaleDateString("es-AR", { weekday: "long", day: "numeric", month: "long" });
 const fmtHora = d => d.toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit", hourCycle: "h23" });
 const cap = s => s.charAt(0).toUpperCase() + s.slice(1);
+const isoDia = d => d ? `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}` : null;
 const pesos = n => "$\u00a0" + Math.round(n).toLocaleString("es-AR");
 
 /* =========================================================
@@ -1229,15 +1255,23 @@ const Api = (() => {
         headers: { apikey: key, Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
         body: JSON.stringify(body)
       });
-      if (!r.ok) throw new Error(`HTTP ${r.status}`);
+      if (!r.ok) {
+        // El servidor rechazó el pedido (límite, datos inválidos): se muestra su mensaje
+        let msg = ""; try { msg = (await r.json()).message || ""; } catch (_) {}
+        const e = new Error(msg || `HTTP ${r.status}`); e.servidor = true; throw e;
+      }
       return await r.json();
     } finally { clearTimeout(t); }
   }
   return {
-    // Devuelve el código del pedido creado, o null si falló
+    // Devuelve { codigo } si se creó, { error } si el servidor lo rechazó, o { sinConexion: true }
     async crearPedido(datos) {
-      try { const c = await rpc("crear_pedido_web", datos); return typeof c === "string" ? c : null; }
-      catch (_) { return null; }
+      try {
+        const c = await rpc("crear_pedido_web", datos);
+        return typeof c === "string" ? { codigo: c } : { sinConexion: true };
+      } catch (e) {
+        return e.servidor ? { error: e.message } : { sinConexion: true };
+      }
     },
     // Devuelve { pedido } o { pedido: null } si no existe; lanza error si no hay conexión
     async consultar(codigo) {
@@ -1504,6 +1538,21 @@ function setErr(id, msg, input) {
 }
 const phoneOk = v => v.replace(/\D/g, "").length >= 8;
 
+/* Política de reservas (texto armado desde CONFIG.politica) */
+function politicaHTML(mudanza) {
+  const P = CONFIG.politica;
+  const ej = P.ejemplo ? `<span class="ej-tag">Ejemplo</span>` : "";
+  return `<strong>Política de reservas ${ej}</strong>
+    <ul>
+      <li>Antes de pasar, te escribimos para <b>confirmar</b> el pedido.</li>
+      <li>Te mandamos un <b>recordatorio</b> el día anterior.</li>
+      <li>Podés cancelar <b>sin costo hasta ${P.cancelacionHoras} h antes</b> del retiro.</li>
+      ${mudanza
+        ? `<li>Para reservar la fecha pedimos una <b>seña del ${P.senaMudanzaPct}%</b> del presupuesto, que se descuenta del total. Si cancelás con menos de ${P.cancelacionHoras} h, la seña no se devuelve.</li>`
+        : `<li>Si no hay nadie para entregar o retirar, la próxima vez te pedimos pagar por adelantado.</li>`}
+    </ul>`;
+}
+
 /* =========================================================
    MIS PEDIDOS (los que se hicieron desde este dispositivo)
    ========================================================= */
@@ -1562,10 +1611,11 @@ const MyOrders = (() => {
       }
       try {
         const { pedido } = await Api.consultar(p.codigo);
-        if (pedido && pedido.estado === 6) { quitarDeLaVista(p.codigo); return; }
+        if (pedido && (pedido.estado === 6 || pedido.cancelado)) { quitarDeLaVista(p.codigo); return; }
         const el = box.querySelector(`[data-st="${CSS.escape(p.codigo)}"]`);
         if (el) {
-          el.textContent = pedido ? ESTADO_CORTO[pedido.estado] : "Sin datos";
+          el.textContent = !pedido ? "Sin datos"
+            : (!pedido.confirmado && pedido.estado === 0) ? "Por confirmar" : ESTADO_CORTO[pedido.estado];
           el.classList.toggle("ok", !!pedido && pedido.estado === 6);
         }
       } catch (_) {
@@ -1778,28 +1828,37 @@ const Send = (() => {
       ["Nombre", d.nombre], ["Teléfono", d.telefono]
     ].map(([k, v]) => `<div><dt>${k}</dt><dd>${esc(v)}</dd></div>`).join("");
     $("#sendDestNote").textContent = `Tu pedido le llega a ${b.contacto} (base ${b.ciudad}, ${b.telefono}).`;
+    $("#sendPolicy").innerHTML = politicaHTML(false);
+    setErr("errSendFinal", "");
   }
 
   let lastCode = null, sending = false;
   // conWhatsApp = false: "Confirmar pedido" (le llega solo al panel del chofer)
   // conWhatsApp = true:  además abre WhatsApp con el mensaje armado
+  const abierto = Date.now();
   async function finish(conWhatsApp = false) {
     if ($("#sendDone").hidden === false || sending) return; // ya confirmado
+    if (!$("#sendAcepto").checked) { setErr("errSendFinal", "Para confirmar, aceptá la política de reservas."); return; }
+    setErr("errSendFinal", "");
+    // Antispam: campo invisible completado o formulario hecho en segundos = robot
+    if ($("#sendHp").value || Date.now() - abierto < 4000) { setErr("errSendFinal", "No pudimos procesar el pedido. Probá de nuevo."); return; }
     const d = data(), b = baseDeOrigen();
     sending = true;
     const btn = $("#sendNext"), wbtn = $("#sendWa");
     btn.disabled = true; wbtn.disabled = true;
     // Se crea el pedido REAL en la base y se guarda en "Mis pedidos" de este dispositivo
-    lastCode = await Api.crearPedido({
+    const res = await Api.crearPedido({
       p_origen: d.origen, p_destino: d.destino, p_tamano: `${d.tamano} · Total ${d.total}`,
       p_retiro: `${d.fecha}, ${d.franja}`, p_contrarreembolso: d.contrarreembolso,
-      p_nombre: d.nombre, p_telefono: d.telefono, p_pago: d.pago
+      p_nombre: d.nombre, p_telefono: d.telefono, p_pago: d.pago, p_retiro_fecha: isoDia(state.date)
     });
     btn.disabled = false; wbtn.disabled = false; sending = false;
+    if (res.error) { setErr("errSendFinal", res.error); return; } // el servidor lo rechazó (límites, datos)
+    lastCode = res.codigo || null;
     if (lastCode) {
       MyOrders.add({ codigo: lastCode, origen: d.origen, destino: d.destino, tipo: "Paquete" });
       $("#sendCodeLbl").textContent = "Tu código de pedido:";
-      $("#sendDoneNote").textContent = `Ya le llegó a ${b.contacto} (base ${b.ciudad}). Te avisamos cuando lo retiremos.`;
+      $("#sendDoneNote").textContent = `Lo recibió ${b.contacto} (base ${b.ciudad}). Te va a escribir al ${d.telefono} para confirmar el retiro antes de pasar.`;
     } else {
       // Sin conexión con la base: pedido de PRUEBA para poder ver el seguimiento
       lastCode = Tracker.newCode();
@@ -1865,6 +1924,7 @@ const Send = (() => {
     cal.reset();
     $("#sendFoot").innerHTML = footHTML;
     $("#sendCode").hidden = false;
+    $("#sendAcepto").checked = false;
     bindWizard();
   }
   bindWizard();
@@ -1950,20 +2010,29 @@ const Send = (() => {
     rows.push(["Nombre", d.nombre], ["Teléfono", d.telefono]);
     $("#moveSummary").innerHTML = rows.map(([k, v]) => `<div><dt>${k}</dt><dd>${esc(v)}</dd></div>`).join("");
     $("#moveDestNote").textContent = `Tu pedido le llega a ${b.contacto} (base ${b.ciudad}, ${b.telefono}).`;
+    $("#movePolicy").innerHTML = politicaHTML(true);
+    setErr("errMoveFinal", "");
   }
 
   let moving = false;
+  const abiertoMov = Date.now();
   async function finish(conWhatsApp = false) {
     if (moving || !$("#moveDone").hidden) return;
+    if (!$("#moveAcepto").checked) { setErr("errMoveFinal", "Para confirmar, aceptá la política de reservas."); return; }
+    setErr("errMoveFinal", "");
+    if ($("#moveHp").value || Date.now() - abiertoMov < 4000) { setErr("errMoveFinal", "No pudimos procesar el pedido. Probá de nuevo."); return; }
     moving = true; $("#moveNext").disabled = true; $("#moveWa").disabled = true;
     const d = data(), b = base();
     // La mudanza también queda registrada para poder seguirla
-    const codigo = await Api.crearPedido({
+    const res = await Api.crearPedido({
       p_origen: d.origen.slice(0, 80), p_destino: d.destino.slice(0, 80),
-      p_tamano: `Mudanza ${d.tipo}`.slice(0, 40), p_retiro: `${d.fecha}, ${d.horario}`,
-      p_contrarreembolso: "No", p_nombre: d.nombre, p_telefono: d.telefono
+      p_tamano: `Mudanza ${d.tipo}, ${d.ambientes} amb.`.slice(0, 60), p_retiro: `${d.fecha}, ${d.horario}`,
+      p_contrarreembolso: "No", p_nombre: d.nombre, p_telefono: d.telefono,
+      p_pago: `Seña ${CONFIG.politica.senaMudanzaPct}% a coordinar`, p_retiro_fecha: isoDia(state.date)
     });
     moving = false; $("#moveNext").disabled = false; $("#moveWa").disabled = false;
+    if (res.error) { setErr("errMoveFinal", res.error); return; }
+    const codigo = res.codigo || null;
     let codigoFinal = codigo;
     if (codigo) MyOrders.add({ codigo, origen: d.origen, destino: d.destino, tipo: "Mudanza" });
     else {
@@ -1991,7 +2060,7 @@ const Send = (() => {
     $("#moveCode").textContent = codigoFinal;
     $("#moveCodeLbl").textContent = codigo ? "Tu código de pedido:" : "Tu código de pedido (modo prueba):";
     $("#moveDoneNote").textContent = codigo
-      ? `Ya le llegó a ${b.contacto} (base ${b.ciudad}). Te contacta para pasarte el presupuesto.`
+      ? `Lo recibió ${b.contacto} (base ${b.ciudad}). Te va a escribir para confirmar la fecha, pasarte el presupuesto y coordinar la seña.`
       : "Modo prueba: el seguimiento es simulado.";
     $("#moveFoot").innerHTML = `
       <span></span>
@@ -2175,7 +2244,17 @@ const Tracker = (() => {
   /* ----- MODO REAL: lee el pedido de la base y se actualiza solo ----- */
   function applyReal(p) {
     const h = p.historial || {};
-    const sig = `${p.estado}|${p.foto_path || ""}|${p.receptor || ""}`;
+    // Aviso de "por confirmar" o "cancelado"
+    const nota = $("#oPending");
+    if (p.cancelado) {
+      nota.textContent = "Este pedido fue cancelado. Si es un error, escribinos por WhatsApp.";
+      nota.className = "pending-note cancel"; nota.hidden = false;
+      MyOrders.remove(code); pause();
+    } else if (!p.confirmado && p.estado === 0) {
+      nota.textContent = "Por confirmar: te vamos a escribir por WhatsApp para confirmar el retiro antes de pasar.";
+      nota.className = "pending-note"; nota.hidden = false;
+    } else nota.hidden = true;
+    const sig = `${p.estado}|${p.foto_path || ""}|${p.receptor || ""}|${p.confirmado}|${p.cancelado}`;
     if (sig === lastSig) return;                 // nada cambió: no se redibuja
     const prev = lastSig ? Number(lastSig.split("|")[0]) : -1;
     lastSig = sig;
@@ -2210,6 +2289,7 @@ const Tracker = (() => {
 
   function start() {
     setMode("demo");
+    $("#oPending").hidden = true;
     $("#oEtaLbl").textContent = "Hora estimada";
     idx = 0; times = [fmtHora(new Date())];
     $("#stage").innerHTML = "";
