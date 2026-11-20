@@ -402,7 +402,13 @@ textarea.input{min-height:96px;resize:vertical}
 .qty button:hover{background:rgba(255,255,255,.2)}
 .qty button:disabled{opacity:.35;cursor:not-allowed}
 .qty output{min-width:28px;text-align:center;font-weight:700}
-.items-total{font-weight:600;color:#cfe6fb;font-size:.95rem}
+.items-total{display:flex;flex-wrap:wrap;align-items:center;gap:6px 12px;font-weight:600;color:#cfe6fb;font-size:.95rem;padding:12px 14px;border-radius:var(--radius-sm);background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.14)}
+.cart-total{margin-left:auto;font-family:var(--font-title);font-size:1.2rem;color:#fff}
+.item-price{display:block;font-size:.82rem;color:#cfe6fb;margin-top:2px}
+.item-price b{color:#fff;white-space:nowrap}
+.ej-note{font-size:.78rem;color:#ffd59c;font-weight:500}
+.ej-note:empty{display:none}
+#quoteEj{color:#9a5b00;font-size:.85rem}
 
 /* Pago */
 .pay-box{display:grid;gap:12px;padding:14px;border-radius:var(--radius-sm);background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.14)}
@@ -722,7 +728,8 @@ textarea.input{min-height:96px;resize:vertical}
     <div class="sec-head reveal">
       <span class="kicker">Cotización</span>
       <h2 id="quoteTitle">Cotizá tu envío.</h2>
-      <p>Elegí el tamaño y escribinos: te respondemos con el precio.</p>
+      <p>Precios por bulto entre Goya y Resistencia. Armá tu envío y ves el total al instante.</p>
+      <p class="ej-note" id="quoteEj"></p>
     </div>
     <div class="quote-grid" id="quoteGrid"><!-- se completa desde CONFIG.precios --></div>
   </div>
@@ -1094,14 +1101,17 @@ const CONFIG = {
     tarjetas: ["Visa", "Mastercard", "American Express", "Cabal", "Naranja X"]
   },
 
-  /* PRECIOS: dejá "" para mostrar "Precio a consultar".
-     Ejemplo con precio: sobre: "$ 3.500"  */
+  /* PRECIOS por bulto, en pesos (número). null = "a cotizar".
+     ⚠ Son PRECIOS DE EJEMPLO para la demo: reemplazalos por los reales del cliente
+     y poné preciosEjemplo: false para sacar la aclaración. */
+  preciosEjemplo: true,
   precios: {
-    sobre:   "",
-    chica:   "",
-    mediana: "",
-    grande:  "",
-    mudanza: ""
+    sobre:    3500,
+    chica:    6000,
+    mediana:  9500,
+    grande:  14000,
+    especial: null,
+    mudanza:  null
   },
 
   /* SEGUIMIENTO REAL (Supabase). La clave anon es pública y es seguro que esté acá:
@@ -1137,6 +1147,7 @@ const enMarco = (() => { try { return window.self !== window.top; } catch (_) { 
 const fmtFecha = d => d.toLocaleDateString("es-AR", { weekday: "long", day: "numeric", month: "long" });
 const fmtHora = d => d.toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit", hourCycle: "h23" });
 const cap = s => s.charAt(0).toUpperCase() + s.slice(1);
+const pesos = n => "$\u00a0" + Math.round(n).toLocaleString("es-AR");
 
 /* =========================================================
    CONEXIÓN CON LA BASE (Supabase, vía su API REST)
@@ -1204,7 +1215,7 @@ function renderQuotes() {
       <span class="card-ico">${icon(it.icono)}</span>
       <h3>${esc(it.nombre)}</h3>
       <p class="q-desc">${esc(it.desc)}</p>
-      <p class="price ${p ? "" : "tbd"}">${p ? esc(p) : "Precio a consultar"}</p>
+      <p class="price ${p ? "" : "tbd"}">${p ? `${pesos(p)} <small style="font-weight:500;color:var(--muted);font-family:var(--font-text);font-size:.8rem">por bulto</small>` : "Precio a consultar"}</p>
       <button class="btn btn-wa" type="button" data-wa-pick="Hola, quiero consultar el precio de: ${esc(it.nombre)}.">${icon("i-wa")} Consultar</button>
     </article>`;
   }).join("");
@@ -1503,7 +1514,8 @@ const Send = (() => {
       return `
       <div class="item-row${n ? " on" : ""}">
         <svg class="big" aria-hidden="true"><use href="#${t.icono}"/></svg>
-        <div><strong>${t.nombre}</strong><small>${t.desc}</small></div>
+        <div><strong>${t.nombre}</strong><small>${t.desc}</small>
+          <span class="item-price">${precioDe(t.id) ? `${pesos(precioDe(t.id))} c/u${n ? ` · <b>${pesos(precioDe(t.id) * n)}</b>` : ""}` : "A cotizar"}</span></div>
         <div class="qty" role="group" aria-label="Cantidad de ${t.nombre}">
           <button type="button" data-q="-1" data-id="${t.id}" aria-label="Quitar ${t.nombre}" ${n ? "" : "disabled"}>−</button>
           <output aria-live="polite">${n}</output>
@@ -1512,9 +1524,22 @@ const Send = (() => {
       </div>`;
     }).join("");
     const total = totalBultos();
-    $("#itemsTotal").textContent = total
-      ? `${total} bulto${total === 1 ? "" : "s"}: ${resumenBultos()}`
+    const imp = importe();
+    $("#itemsTotal").innerHTML = total
+      ? `<span>${total} bulto${total === 1 ? "" : "s"}</span>
+         <span class="cart-total">Total ${pesos(imp.total)}${imp.aCotizar ? " + a cotizar" : ""}</span>
+         ${CONFIG.preciosEjemplo ? `<small class="ej-note">Precios de ejemplo</small>` : ""}`
       : "Todavía no agregaste bultos";
+  }
+  const precioDe = id => CONFIG.precios[id] ?? null;
+  // Total del carrito: suma los bultos con precio; los "a cotizar" se avisan aparte
+  function importe() {
+    let total = 0, aCotizar = 0;
+    for (const [id, n] of Object.entries(state.items)) {
+      const pr = precioDe(id);
+      if (pr) total += pr * n; else aCotizar += n;
+    }
+    return { total, aCotizar };
   }
   const totalBultos = () => Object.values(state.items).reduce((a, b) => a + b, 0);
   const resumenBultos = () => CONFIG.tamanos
@@ -1610,6 +1635,7 @@ const Send = (() => {
       destino: cityValue("destino"),
       tamano: resumenBultos(),
       bultos: totalBultos(),
+      total: (() => { const t = importe(); return t.total ? `${pesos(t.total)}${t.aCotizar ? " + a cotizar" : ""}` : "A cotizar"; })(),
       fecha: state.date ? cap(fmtFecha(state.date)) : "",
       franja: state.slot,
       contrarreembolso: cod ? `Sí · ${medio}${monto ? ` · $ ${monto}` : ""}` : "No",
@@ -1653,6 +1679,7 @@ const Send = (() => {
     const d = data(), b = baseDeOrigen();
     $("#sendSummary").innerHTML = [
       ["Origen", d.origen], ["Destino", d.destino], [`Bultos (${d.bultos})`, d.tamano],
+      ["Total del envío", d.total + (CONFIG.preciosEjemplo ? " (precios de ejemplo)" : "")],
       ["Retiro", `${d.fecha}, ${d.franja}`], ["Contrarreembolso", d.contrarreembolso],
       ["Pago del envío", d.pago],
       ["Nombre", d.nombre], ["Teléfono", d.telefono]
@@ -1671,7 +1698,7 @@ const Send = (() => {
     btn.disabled = true; wbtn.disabled = true;
     // Se crea el pedido REAL en la base y se guarda en "Mis pedidos" de este dispositivo
     lastCode = await Api.crearPedido({
-      p_origen: d.origen, p_destino: d.destino, p_tamano: d.tamano,
+      p_origen: d.origen, p_destino: d.destino, p_tamano: `${d.tamano} · Total ${d.total}`,
       p_retiro: `${d.fecha}, ${d.franja}`, p_contrarreembolso: d.contrarreembolso,
       p_nombre: d.nombre, p_telefono: d.telefono, p_pago: d.pago
     });
@@ -1696,6 +1723,7 @@ const Send = (() => {
       `• Origen: ${d.origen}`,
       `• Destino: ${d.destino}`,
       `• Bultos (${d.bultos}): ${d.tamano}`,
+      `• Total del envío: ${d.total}`,
       `• Retiro: ${d.fecha}, ${d.franja}`,
       `• Contrarreembolso: ${d.contrarreembolso}`,
       `• Pago del envío: ${d.pago}`,
@@ -2194,6 +2222,7 @@ const Tracker = (() => {
    ========================================================= */
 renderBases();
 renderQuotes();
+if (CONFIG.preciosEjemplo) $("#quoteEj").textContent = "Precios de ejemplo para la demostración.";
 
 // Aparición suave al hacer scroll
 (() => {
