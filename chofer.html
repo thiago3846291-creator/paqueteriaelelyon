@@ -267,7 +267,8 @@ function render(){
       <div class="steps" aria-hidden="true">${steps}</div>
       <div class="dl">
         ${p.cliente_nombre ? `<div><span>Cliente:</span> ${esc(p.cliente_nombre)}</div>` : ""}
-        ${p.tamano ? `<div><span>Tamaño:</span> ${esc(p.tamano)}</div>` : ""}
+        ${p.tamano ? `<div><span>Bultos:</span> ${esc(p.tamano)}</div>` : ""}
+        ${p.pago ? `<div><span>Pago del envío:</span> ${esc(p.pago)}</div>` : ""}
         ${p.retiro ? `<div><span>Retiro:</span> ${esc(p.retiro)}</div>` : ""}
         ${p.contrarreembolso && p.contrarreembolso !== "No" ? `<div><span>Contrarreembolso:</span> ${esc(p.contrarreembolso)}</div>` : ""}
         ${p.estado===6 && p.receptor ? `<div><span>Recibió:</span> ${esc(p.receptor)}</div>` : ""}
