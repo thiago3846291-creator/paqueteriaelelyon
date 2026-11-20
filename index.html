@@ -1425,6 +1425,8 @@ function openPanel(name) {
     target && target.focus({ preventScroll: true });
   });
   if (name === "track") Tracker.onOpen();
+  if (name === "send" && Send.terminado()) Send.reset();
+  if (name === "move" && Move.terminado()) Move.reset();
 }
 
 function closePanel() {
@@ -2007,14 +2009,16 @@ const Send = (() => {
     bindWizard();
   }
   bindWizard();
+  return { reset, terminado: () => !$("#sendDone").hidden };
 })();
 
 /* =========================================================
    PANEL "MUDANZA"
    ========================================================= */
-(() => {
+const Move = (() => {
   const form = $("#moveForm");
   const state = { tipo: null, amb: 2, slot: null, date: null };
+  const footHTMLMove = $("#moveFoot").innerHTML;
   const tipos = [
     { v: "Departamento", i: "i-home", d: "Con o sin escaleras" },
     { v: "Casa", i: "i-home", d: "Todo el hogar" },
@@ -2151,13 +2155,30 @@ const Send = (() => {
     if (conWhatsApp && !enMarco) window.location.href = url;
   }
 
-  createWizard({
-    form, back: $("#moveBack"), next: $("#moveNext"),
-    label: $("#moveStepLabel"), name: $("#moveStepName"),
-    bar: $("#p-move .progress-bar"), validate, onEnter,
-    lastLabel: `Confirmar pedido ${icon("i-check")}`, onFinish: () => finish(false)
-  });
-  $("#moveWa").addEventListener("click", () => finish(true));
+  function bindWizard() {
+    createWizard({
+      form, back: $("#moveBack"), next: $("#moveNext"),
+      label: $("#moveStepLabel"), name: $("#moveStepName"),
+      bar: $("#p-move .progress-bar"), validate, onEnter,
+      lastLabel: `Confirmar pedido ${icon("i-check")}`, onFinish: () => finish(false)
+    });
+    $("#moveWa").addEventListener("click", () => finish(true));
+  }
+  // Deja el formulario como nuevo (después de confirmar un pedido)
+  function reset() {
+    form.reset();
+    state.tipo = null; state.amb = 2; state.slot = null; state.date = null;
+    paintAmb();
+    if (typeof cal !== "undefined" && cal.reset) cal.reset();
+    $$(".field-err", form).forEach(e => e.textContent = "");
+    $("#moveDone").hidden = true;
+    $("#moveSummaryWrap").hidden = false;
+    $("#moveAcepto").checked = false;
+    $("#moveFoot").innerHTML = footHTMLMove;
+    bindWizard();
+  }
+  bindWizard();
+  return { reset, terminado: () => !$("#moveDone").hidden };
 })();
 
 /* =========================================================
@@ -2326,9 +2347,12 @@ const Tracker = (() => {
     // Aviso de "por confirmar" o "cancelado"
     const nota = $("#oPending");
     if (p.cancelado) {
-      nota.textContent = "Este pedido fue cancelado. Si es un error, escribinos por WhatsApp.";
-      nota.className = "pending-note cancel"; nota.hidden = false;
-      MyOrders.remove(code); pause();
+      // Cancelado: se quita de todos lados y se vuelve a "Mis pedidos"
+      const c = code;
+      MyOrders.remove(c); pause(); code = null; lastSig = "";
+      showList();
+      setErr("errTrack", `El pedido ${c} fue cancelado. Cuando quieras, podés hacer un envío nuevo.`);
+      return;
     } else if (!p.confirmado && p.estado === 0) {
       nota.textContent = "Por confirmar: te vamos a escribir por WhatsApp para confirmar el retiro antes de pasar.";
       nota.className = "pending-note"; nota.hidden = false;
