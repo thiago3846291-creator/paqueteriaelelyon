@@ -8,6 +8,14 @@
 <meta name="theme-color" content="#081a3a">
 <!-- Instalable como app en el celular -->
 <link rel="manifest" href="app.webmanifest">
+<script>
+  /* Modo liviano: equipos con pocos núcleos/memoria o que piden menos transparencias */
+  (function () {
+    var n = navigator.hardwareConcurrency || 8, m = navigator.deviceMemory || 8;
+    var poca = window.matchMedia && matchMedia("(prefers-reduced-transparency: reduce)").matches;
+    if (n <= 4 || m <= 4 || poca) document.documentElement.classList.add("lite");
+  })();
+</script>
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
 <link rel="apple-touch-icon" href="icon-180.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -79,8 +87,8 @@ body.lock{overflow:hidden}
   position:relative;
   background:linear-gradient(180deg,rgba(255,255,255,.17),rgba(255,255,255,.07));
   border:1px solid rgba(255,255,255,.24);
-  -webkit-backdrop-filter:blur(18px) saturate(150%);
-  backdrop-filter:blur(18px) saturate(150%);
+  -webkit-backdrop-filter:blur(12px);
+  backdrop-filter:blur(12px);
   box-shadow:inset 0 1px 0 rgba(255,255,255,.38),0 12px 34px rgba(2,10,30,.35);
 }
 /* brillo sutil en el borde superior */
@@ -90,10 +98,9 @@ body.lock{overflow:hidden}
   opacity:.7;pointer-events:none;
 }
 .glass-dark{
-  background:linear-gradient(180deg,rgba(14,38,82,.80),rgba(8,26,58,.86));
+  /* Casi opaco y SIN desenfoque de fondo: se ve igual y no recalcula la página de atrás en cada cuadro */
+  background:linear-gradient(180deg,rgba(16,40,86,.97),rgba(8,26,58,.98));
   border:1px solid rgba(255,255,255,.18);
-  -webkit-backdrop-filter:blur(26px) saturate(150%);
-  backdrop-filter:blur(26px) saturate(150%);
   box-shadow:inset 0 1px 0 rgba(255,255,255,.25),0 30px 80px rgba(0,0,0,.45);
 }
 @supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){
@@ -150,7 +157,7 @@ body.lock{overflow:hidden}
   .nav-toggle{display:grid}
   .nav-links{
     position:absolute;top:calc(100% + 8px);left:0;right:0;flex-direction:column;padding:8px;border-radius:22px;
-    background:rgba(8,26,58,.92);-webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px);
+    background:rgba(8,26,58,.97);
     border:1px solid rgba(255,255,255,.18);
     opacity:0;visibility:hidden;transform:translateY(-6px);transition:opacity .2s,transform .2s var(--ease),visibility .2s;
   }
@@ -491,7 +498,9 @@ textarea.input{min-height:96px;resize:vertical}
 .dot svg{width:15px;height:15px;stroke:var(--navy);opacity:0;transition:opacity .2s}
 .tl.done .dot{background:var(--sky);border-color:var(--sky)}
 .tl.done .dot svg{opacity:1}
-.tl.current .dot{border-color:var(--gold);background:var(--gold);animation:pulse 1.6s ease-in-out infinite}
+.tl.current .dot{border-color:var(--gold);background:var(--gold)}
+.tl.current .dot::before{content:"";position:absolute;inset:-2px;border-radius:50%;border:2px solid var(--gold);animation:ring 1.6s ease-out infinite;pointer-events:none}
+@keyframes ring{from{transform:scale(1);opacity:.8}to{transform:scale(1.7);opacity:0}}
 .tl.current .dot::after{content:"";width:8px;height:8px;border-radius:50%;background:var(--navy)}
 @keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(242,163,58,.55)}50%{box-shadow:0 0 0 8px rgba(242,163,58,0)}}
 .tl .tl-t{font-weight:600;padding-top:3px;transition:color .3s}
@@ -585,7 +594,6 @@ textarea.input{min-height:96px;resize:vertical}
   position:relative;isolation:isolate;
   --mx:50%;--my:50%;
   transition:transform .45s cubic-bezier(.34,1.56,.64,1),box-shadow .45s var(--ease),border-color .3s,background-color .3s;
-  will-change:transform;
 }
 .card,.step,.q-card,.base{overflow:hidden}
 /* luz que sigue al puntero */
@@ -621,6 +629,45 @@ html .choice:active,html .card:active,html .q-card:active,html .base:active,html
 .choice:active::after{opacity:1}
 
 /* =========================================================
+   RUTA DEL CAMIONCITO (reemplaza la barra de desplazamiento)
+   Gris = lo que falta recorrer · Amarillo = el rastro que deja.
+   ========================================================= */
+html{scrollbar-width:none}
+html::-webkit-scrollbar{display:none}
+.ruta{
+  position:fixed;z-index:45;right:16px;top:104px;bottom:26px;width:26px;
+  touch-action:none;cursor:pointer;
+}
+.ruta-gris,.ruta-amarilla{position:absolute;left:50%;top:0;width:4px;margin-left:-2px;border-radius:4px}
+.ruta-gris{bottom:0;background:repeating-linear-gradient(180deg,rgba(150,162,184,.75) 0 10px,transparent 10px 17px)}
+.ruta-amarilla{height:0;background:linear-gradient(180deg,#ffd34d,#f2a33a);box-shadow:0 0 8px rgba(255,200,60,.55);transform-origin:top}
+.ruta-punto{position:absolute;left:50%;width:10px;height:10px;margin-left:-5px;border-radius:50%;border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.35)}
+.ruta-punto.inicio{top:-6px;background:#f2a33a}
+.ruta-punto.fin{bottom:-6px;background:#96a2b8;transition:background-color .3s}
+.ruta.llego .ruta-punto.fin{background:#f2a33a}
+.camion{
+  position:absolute;left:50%;top:0;width:22px;height:40px;margin-left:-11px;
+  will-change:transform;filter:drop-shadow(0 3px 4px rgba(0,0,0,.35));
+}
+.camion svg{display:block;width:100%;height:100%;transition:transform .25s}
+.ruta.mueve .camion svg{animation:vaiven .5s ease-in-out infinite}
+@keyframes vaiven{0%,100%{transform:translateX(0)}50%{transform:translateX(.6px)}}
+.camion .luz-reversa{opacity:0;transition:opacity .2s}
+.ruta.reversa .camion .luz-reversa{opacity:1}
+.ruta:hover .ruta-gris{background:repeating-linear-gradient(180deg,rgba(170,182,204,.95) 0 10px,transparent 10px 17px)}
+@media (max-width:760px){.ruta{display:none}}
+/* En pantallas medianas, el contenido deja lugar a la ruta del costado */
+@media (min-width:761px) and (max-width:1260px){.wrap{width:min(1140px,100% - 104px);margin-left:max(16px,calc((100% - 1140px) / 2));margin-right:auto}}
+@media (prefers-reduced-motion:reduce){.ruta.mueve .camion svg{animation:none}}
+
+/* Modo liviano: se activa solo si el equipo es modesto o la animación va lenta.
+   Se ve casi igual, pero sin desenfoques ni sombras animadas. */
+html.lite .glass{-webkit-backdrop-filter:none;backdrop-filter:none;background:linear-gradient(180deg,rgba(44,78,140,.82),rgba(20,46,96,.86))}
+html.lite .choice::after,html.lite .card::after,html.lite .step::after,html.lite .q-card::after,html.lite .base::after,html.lite .trust-item::after{display:none}
+html.lite :is(.choice,.card,.step,.q-card,.base,.trust-item){transition:transform .35s cubic-bezier(.34,1.56,.64,1)}
+html.lite .overlay{background:rgba(3,10,26,.7)}
+
+/* =========================================================
    9. ANIMACIONES AL HACER SCROLL
    ========================================================= */
 .reveal{opacity:0;transform:translateY(16px);transition:opacity .4s var(--ease),transform .4s var(--ease)}
@@ -633,11 +680,43 @@ html .choice:active,html .card:active,html .q-card:active,html .base:active,html
   html{scroll-behavior:auto}
   *,*::before,*::after{animation-duration:.01ms !important;animation-iteration-count:1 !important;transition-duration:.01ms !important}
   .reveal{opacity:1;transform:none}
-  .tl.current .dot{animation:none;box-shadow:0 0 0 4px rgba(242,163,58,.35)}
+  .tl.current .dot::before{animation:none;opacity:.4;transform:scale(1.3)}
 }
 </style>
 </head>
 <body>
+<!-- Ruta del camioncito: indica cuánto bajaste. Tocala o arrastrala para moverte. -->
+<div class="ruta" id="ruta" role="scrollbar" aria-controls="top" aria-orientation="vertical" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-label="Avance en la página">
+  <div class="ruta-gris"></div>
+  <div class="ruta-amarilla" id="rutaAmarilla"></div>
+  <span class="ruta-punto inicio"></span>
+  <span class="ruta-punto fin"></span>
+  <div class="camion" id="camion" aria-hidden="true">
+    <!-- Camioncito visto desde arriba (la cabina mira hacia abajo, hacia donde avanza) -->
+    <svg viewBox="0 0 22 40">
+      <!-- luces de reversa (atrás, arriba) -->
+      <g class="luz-reversa"><rect x="3" y="0" width="4" height="2" rx="1" fill="#fff"/><rect x="15" y="0" width="4" height="2" rx="1" fill="#fff"/></g>
+      <!-- ruedas -->
+      <rect x="0" y="6" width="3" height="7" rx="1.2" fill="#1b2433"/>
+      <rect x="19" y="6" width="3" height="7" rx="1.2" fill="#1b2433"/>
+      <rect x="0" y="29" width="3" height="6" rx="1.2" fill="#1b2433"/>
+      <rect x="19" y="29" width="3" height="6" rx="1.2" fill="#1b2433"/>
+      <!-- caja de carga -->
+      <rect x="2" y="1.5" width="18" height="25" rx="2.5" fill="#f4f7fc" stroke="#c9d4e6" stroke-width=".8"/>
+      <rect x="2" y="12" width="18" height="2.6" fill="#f2a33a"/>
+      <rect x="2" y="15.4" width="18" height="1.4" fill="#1559c4"/>
+      <!-- cabina -->
+      <rect x="3" y="26.5" width="16" height="12" rx="3.5" fill="#1559c4"/>
+      <rect x="4.6" y="33" width="12.8" height="4.3" rx="1.6" fill="#9fd4ff"/>
+      <!-- espejos -->
+      <rect x="1" y="29.5" width="2.2" height="1.6" rx=".6" fill="#0e2b5e"/>
+      <rect x="18.8" y="29.5" width="2.2" height="1.6" rx=".6" fill="#0e2b5e"/>
+      <!-- luces delanteras -->
+      <circle cx="6" cy="38.6" r=".9" fill="#ffe9a6"/>
+      <circle cx="16" cy="38.6" r=".9" fill="#ffe9a6"/>
+    </svg>
+  </div>
+</div>
 
 <!-- ============ ÍCONOS (se reutilizan con <use>) ============ -->
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
@@ -2424,14 +2503,86 @@ if (CONFIG.preciosEjemplo) $("#quoteEj").textContent = "Precios de ejemplo para 
   mostrar();
 })();
 
+/* Ruta del camioncito: sigue el scroll (solo transform, muy liviano) */
+(() => {
+  const ruta = $("#ruta"); if (!ruta) return;
+  const amarilla = $("#rutaAmarilla"), camion = $("#camion");
+  const CAM = 40;
+  let ultimoY = window.scrollY, quieto = null, pedido = false;
+  function pintar() {
+    pedido = false;
+    const max = document.documentElement.scrollHeight - innerHeight;
+    const p = max > 0 ? Math.min(1, Math.max(0, scrollY / max)) : 0;
+    const alto = ruta.clientHeight;
+    const y = p * (alto - CAM);
+    camion.style.transform = `translateY(${y}px)`;
+    amarilla.style.height = `${y + CAM / 2}px`;
+    ruta.classList.toggle("llego", p > .995);
+    ruta.setAttribute("aria-valuenow", Math.round(p * 100));
+    // Bajando: avanza · Subiendo: va en reversa (prende las luces de atrás)
+    const dy = scrollY - ultimoY;
+    if (Math.abs(dy) > 1) {
+      ruta.classList.add("mueve");
+      ruta.classList.toggle("reversa", dy < 0);
+      clearTimeout(quieto);
+      quieto = setTimeout(() => ruta.classList.remove("mueve", "reversa"), 180);
+    }
+    ultimoY = scrollY;
+  }
+  const pedir = () => { if (!pedido) { pedido = true; requestAnimationFrame(pintar); } };
+  addEventListener("scroll", pedir, { passive: true });
+  addEventListener("resize", pedir);
+  new ResizeObserver(pedir).observe(document.body);
+  pintar();
+
+  // Tocar o arrastrar la ruta mueve la página (reemplaza a la barra del costado)
+  let arrastrando = false;
+  const irA = (clientY, suave) => {
+    const r = ruta.getBoundingClientRect();
+    const p = Math.min(1, Math.max(0, (clientY - r.top - CAM / 2) / (r.height - CAM)));
+    const destino = p * (document.documentElement.scrollHeight - innerHeight);
+    if (suave) deslizarA(destino); else window.scrollTo(0, destino);
+  };
+  ruta.addEventListener("pointerdown", e => {
+    arrastrando = e.target.closest("#camion") !== null;
+    ruta.setPointerCapture(e.pointerId);
+    irA(e.clientY, !arrastrando);
+  });
+  ruta.addEventListener("pointermove", e => { if (arrastrando) irA(e.clientY, false); });
+  const soltar = () => { arrastrando = false; };
+  ruta.addEventListener("pointerup", soltar);
+  ruta.addEventListener("pointercancel", soltar);
+})();
+
+/* Si la animación va lenta en este equipo, se pasa al modo liviano automáticamente */
+(() => {
+  if (document.documentElement.classList.contains("lite")) return;
+  let n = 0, t0 = 0, lentos = 0, prev = 0;
+  const medir = t => {
+    if (!t0) { t0 = prev = t; }
+    if (t - prev > 34) lentos++;
+    prev = t;
+    if (++n < 90) requestAnimationFrame(medir);
+    else if (lentos > 20) document.documentElement.classList.add("lite");
+  };
+  setTimeout(() => requestAnimationFrame(medir), 1200);
+})();
+
 // Luz del "liquid glass" que sigue al puntero (solo con mouse)
 if (window.matchMedia("(hover: hover)").matches && !reduceMotion) {
+  let pendiente = null;
   document.addEventListener("pointermove", e => {
+    if (document.documentElement.classList.contains("lite")) return;
     const el = e.target.closest(".choice,.card,.step,.q-card,.base,.trust-item");
     if (!el) return;
-    const r = el.getBoundingClientRect();
-    el.style.setProperty("--mx", `${e.clientX - r.left}px`);
-    el.style.setProperty("--my", `${e.clientY - r.top}px`);
+    const x = e.clientX, y = e.clientY;
+    if (pendiente) return;
+    pendiente = requestAnimationFrame(() => {
+      pendiente = null;
+      const r = el.getBoundingClientRect();
+      el.style.setProperty("--mx", `${x - r.left}px`);
+      el.style.setProperty("--my", `${y - r.top}px`);
+    });
   }, { passive: true });
 }
 

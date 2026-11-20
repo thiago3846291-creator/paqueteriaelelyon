@@ -29,12 +29,16 @@ html,body{margin:0}
 body{
   min-height:100vh;min-height:100dvh;color:#fff;font-family:var(--font-text);font-size:16px;line-height:1.45;
   background-color:#eef3fb;
-  background-image:
-    linear-gradient(180deg,rgba(238,243,251,.55) 0%,rgba(238,243,251,.82) 55%,#eef3fb 100%),
-    url("https://images.unsplash.com/photo-1601584115197-04ecc0da31d7?auto=format&fit=crop&w=1600&q=70");
-  background-size:cover;background-position:center top;background-attachment:fixed;
   -webkit-font-smoothing:antialiased;
   padding:max(28px,env(safe-area-inset-top)) 16px max(28px,env(safe-area-inset-bottom));
+}
+/* Foto de fondo en una capa fija aparte: no se redibuja al bajar (antes trababa la compu) */
+body::before{
+  content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
+  background:
+    linear-gradient(180deg,rgba(238,243,251,.55) 0%,rgba(238,243,251,.82) 55%,#eef3fb 100%),
+    url("https://images.unsplash.com/photo-1601584115197-04ecc0da31d7?auto=format&fit=crop&w=1400&q=60") center top/cover no-repeat;
+  transform:translateZ(0);
 }
 .shell{
   padding:20px;border-radius:28px;
@@ -56,7 +60,7 @@ button{cursor:pointer}
 .glass{
   background:linear-gradient(180deg,rgba(255,255,255,.12),rgba(255,255,255,.05));
   border:1px solid rgba(255,255,255,.2);border-radius:22px;
-  -webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);
+  -webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);
   box-shadow:inset 0 1px 0 rgba(255,255,255,.3),0 10px 30px rgba(0,0,0,.25);
 }
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:52px;padding:.7em 1.1em;border-radius:16px;border:1px solid transparent;font-weight:600;text-decoration:none;transition:transform .15s,opacity .2s}
@@ -226,6 +230,7 @@ async function boot(){
   $("#loginForm").hidden = true; $("#app").hidden = false; $("#logout").hidden = false;
   load();
   clearInterval(refreshTimer); refreshTimer = setInterval(load, 20000);
+  document.addEventListener("visibilitychange", () => { if (!document.hidden) load(); });
 }
 function showLogin(msg=""){
   $("#app").hidden = true; $("#logout").hidden = true; $("#loginForm").hidden = false;
@@ -259,7 +264,9 @@ $("#logout").addEventListener("click", async () => { clearInterval(refreshTimer)
 
 /* ===== LISTA ===== */
 let faltas = {};   // teléfono normalizado -> cantidad de veces que no estuvo
+let ultimaFirma = "";
 async function load(){
+  if (document.hidden) return;   // con la app en segundo plano no gasta datos ni batería
   let q = sb.from("pedidos").select("*").order("creado", { ascending: false }).limit(80);
   q = tab === "activos" ? q.lt("estado", 6).eq("cancelado", false) : q.or("estado.eq.6,cancelado.eq.true");
   const [{ data, error }, f] = await Promise.all([
@@ -274,6 +281,10 @@ async function load(){
     (a.confirmado - b.confirmado) ||
     String(a.retiro_fecha || "9999").localeCompare(String(b.retiro_fecha || "9999")) ||
     String(b.creado).localeCompare(String(a.creado)));
+  // Solo se redibuja si algo cambió (evita parpadeos y trabas)
+  const firma = tab + JSON.stringify(pedidos) + JSON.stringify(faltas);
+  if (firma === ultimaFirma) return;
+  ultimaFirma = firma;
   render();
 }
 function fotoUrl(path){ return path ? sb.storage.from(BUCKET).getPublicUrl(path).data.publicUrl : ""; }
