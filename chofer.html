@@ -9,6 +9,11 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="El Elyon">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<!-- Instalable como app: ícono y nombre propios en la pantalla de inicio -->
+<link rel="manifest" href="chofer.webmanifest">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-180.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Plus+Jakarta+Sans:wght@700;800&display=swap" rel="stylesheet">
@@ -103,6 +108,8 @@ label{font-weight:600;font-size:.92rem;display:grid;gap:6px}
 .photo{width:100%;border-radius:14px;display:block;border:1px solid var(--line)}
 .empty{padding:30px 18px;text-align:center}
 .list-title{font-size:1.05rem;margin-top:4px}
+.install{padding:14px;display:grid;gap:10px}
+.install p{margin:4px 0 0}
 #list{width:100%;margin:0}
 .link-hist{justify-self:center;background:none;border:0;color:var(--muted);font-size:.9rem;text-decoration:underline;text-underline-offset:3px;padding:8px}
 
@@ -140,6 +147,12 @@ label{font-weight:600;font-size:.92rem;display:grid;gap:6px}
   <!-- PANEL -->
   <section id="app" hidden>
     <div class="wrap" style="gap:12px">
+      <div class="install glass" id="installTip" hidden>
+        <div><strong>Instalá el panel en tu celular</strong>
+          <p class="muted" id="installTxt"></p></div>
+        <div class="row"><button class="btn btn-main btn-sm" id="installBtn" hidden>Instalar</button>
+          <button class="btn btn-ghost btn-sm" id="installNo">Ahora no</button></div>
+      </div>
       <button class="btn btn-gold full" id="newBtn">+ Nuevo pedido</button>
       <h2 class="list-title" id="listTitle">Pedidos activos</h2>
       <div id="list" class="wrap" style="gap:12px" aria-live="polite"></div>
@@ -397,6 +410,34 @@ $("#newBtn").addEventListener("click", () => {
 });
 
 sb.auth.onAuthStateChange((ev) => { if (ev === "SIGNED_OUT") showLogin(); });
+
+/* ===== INSTALAR COMO APP ===== */
+const instalada = matchMedia("(display-mode: standalone)").matches || navigator.standalone === true;
+const esIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+let promptInstalar = null;
+function mostrarTip(){
+  try { if (instalada || localStorage.getItem("elyon_no_instalar")) return; } catch (_) { if (instalada) return; }
+  $("#installTxt").textContent = esIOS
+    ? "En Safari tocá Compartir (el cuadrado con la flecha) → \"Agregar a inicio\". Queda como una app y no tenés que volver a iniciar sesión."
+    : "Queda como una app en tu pantalla de inicio y no tenés que volver a iniciar sesión.";
+  if (!esIOS && !promptInstalar) $("#installTxt").textContent += " En Chrome: menú ⋮ → \"Instalar app\" o \"Agregar a pantalla principal\".";
+  $("#installTip").hidden = false;
+}
+window.addEventListener("beforeinstallprompt", e => {
+  e.preventDefault(); promptInstalar = e;
+  $("#installBtn").hidden = false; mostrarTip();
+});
+$("#installBtn").addEventListener("click", async () => {
+  if (!promptInstalar) return;
+  promptInstalar.prompt();
+  await promptInstalar.userChoice.catch(() => {});
+  promptInstalar = null; $("#installTip").hidden = true;
+});
+$("#installNo").addEventListener("click", () => {
+  $("#installTip").hidden = true;
+  try { localStorage.setItem("elyon_no_instalar", "1"); } catch (_) {}
+});
+setTimeout(mostrarTip, 1500);
 boot();
 </script>
 </body>
